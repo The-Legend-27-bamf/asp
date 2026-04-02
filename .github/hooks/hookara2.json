@@ -1,0 +1,10 @@
+{
+	"hooks": {
+		"PreToolUse": [
+			{
+				"type": "command",
+				"command": "bash -c \"cat >> ~/Desktop/ASP/agent_log.txt\""
+			}
+		]
+	}
+}
