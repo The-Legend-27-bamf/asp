@@ -1,0 +1,56 @@
+@model Kolegij
+@{
+    ViewData["Title"] = "Detalji kolegija";
+}
+
+<section class="page-head">
+    <h1 class="page-title">@Model.Naziv</h1>
+    <p class="page-subtitle">Detaljni prikaz podataka o kolegiju.</p>
+</section>
+
+<section class="details-layout">
+    <article class="detail-panel">
+        <h2 class="panel-title">Osnovni podaci</h2>
+        <div class="detail-list">
+            <div class="detail-item"><span class="detail-label">ID</span><span class="detail-value">@Model.Id</span></div>
+            <div class="detail-item"><span class="detail-label">Naziv</span><span class="detail-value">@Model.Naziv</span></div>
+            <div class="detail-item"><span class="detail-label">ECTS</span><span class="detail-value">@Model.ECTS</span></div>
+        </div>
+    </article>
+
+    <article class="detail-panel">
+        <h2 class="panel-title">Povezani podaci</h2>
+
+        <h3>Profesori</h3>
+        @if (Model.Profesori.Count == 0)
+        {
+            <p class="empty-note">Nema profesora.</p>
+        }
+        else
+        {
+            <ul class="related-list">
+                @foreach (var profesor in Model.Profesori)
+                {
+                    <li><a asp-controller="Profesor" asp-action="Details" asp-route-id="@profesor.Id">@profesor.Ime @profesor.Prezime</a></li>
+                }
+            </ul>
+        }
+
+        <h3>Studenti</h3>
+        @if (Model.Studenti.Count == 0)
+        {
+            <p class="empty-note">Nema studenata.</p>
+        }
+        else
+        {
+            <ul class="related-list">
+                @foreach (var student in Model.Studenti)
+                {
+                    <li><a asp-controller="Student" asp-action="Details" asp-route-id="@student.Id">@student.Ime @student.Prezime</a></li>
+                }
+            </ul>
+        }
+    </article>
+</section>
+
+<a class="link-btn link-btn--ghost back-link" asp-action="Index">Povratak na Index</a>

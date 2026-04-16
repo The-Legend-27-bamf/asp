@@ -1,0 +1,35 @@
+@model IEnumerable<Kolegij>
+@{
+    ViewData["Title"] = "Kolegiji";
+    var kolegiji = new List<Kolegij>(Model);
+}
+
+<section class="page-head">
+    <h1 class="page-title">Kolegiji</h1>
+    <p class="page-subtitle">Kartični pregled kolegija, profesora i studenata.</p>
+</section>
+
+@if (kolegiji.Count == 0)
+{
+    <p class="empty-note">Nema dostupnih kolegija.</p>
+}
+else
+{
+    <section class="cards-grid">
+        @foreach (var kolegij in kolegiji)
+        {
+            <article class="entity-card">
+                <div class="card-top">
+                    <h2 class="card-title">@kolegij.Naziv</h2>
+                    <span class="chip chip--id">ID @kolegij.Id</span>
+                </div>
+                <div class="chip-wrap">
+                    <span class="chip chip--accent">ECTS @kolegij.ECTS</span>
+                    <span class="chip chip--ok">Prof: @kolegij.Profesori.Count</span>
+                    <span class="chip chip--ok">Stud: @kolegij.Studenti.Count</span>
+                </div>
+                <a class="link-btn" asp-action="Details" asp-route-id="@kolegij.Id">Details</a>
+            </article>
+        }
+    </section>
+}

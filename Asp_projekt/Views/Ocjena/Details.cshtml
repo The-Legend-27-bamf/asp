@@ -1,0 +1,42 @@
+@model Ocjena
+@{
+    ViewData["Title"] = "Detalji ocjene";
+}
+
+<section class="page-head">
+    <h1 class="page-title">Ocjena @Model.Vrijednost (@Model.Tip)</h1>
+    <p class="page-subtitle">Detaljni prikaz podataka o ocjeni.</p>
+</section>
+
+<section class="details-layout">
+    <article class="detail-panel">
+        <h2 class="panel-title">Osnovni podaci</h2>
+        <div class="detail-list">
+            <div class="detail-item"><span class="detail-label">ID</span><span class="detail-value">@Model.Id</span></div>
+            <div class="detail-item"><span class="detail-label">Vrijednost</span><span class="detail-value">@Model.Vrijednost</span></div>
+            <div class="detail-item"><span class="detail-label">Tip</span><span class="detail-value">@Model.Tip</span></div>
+            <div class="detail-item"><span class="detail-label">Komentar</span><span class="detail-value">@Model.Komentar</span></div>
+            <div class="detail-item"><span class="detail-label">Datum</span><span class="detail-value">@Model.DatumOcjene.ToString("dd.MM.yyyy")</span></div>
+        </div>
+    </article>
+
+    <article class="detail-panel">
+        <h2 class="panel-title">Povezani entiteti</h2>
+        <div class="detail-list">
+            <div class="detail-item">
+                <span class="detail-label">Profesor</span>
+                <span class="detail-value"><a asp-controller="Profesor" asp-action="Details" asp-route-id="@Model.Profesor.Id">@Model.Profesor.Ime @Model.Profesor.Prezime</a></span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Student</span>
+                <span class="detail-value"><a asp-controller="Student" asp-action="Details" asp-route-id="@Model.Student.Id">@Model.Student.Ime @Model.Student.Prezime</a></span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Kolegij</span>
+                <span class="detail-value"><a asp-controller="Kolegij" asp-action="Details" asp-route-id="@Model.Kolegij.Id">@Model.Kolegij.Naziv</a></span>
+            </div>
+        </div>
+    </article>
+</section>
+
+<a class="link-btn link-btn--ghost back-link" asp-action="Index">Povratak na Index</a>

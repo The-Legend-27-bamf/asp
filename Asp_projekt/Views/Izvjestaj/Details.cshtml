@@ -1,0 +1,35 @@
+@model Izvjestaj
+@{
+    ViewData["Title"] = "Detalji izvjestaja";
+}
+
+<section class="page-head">
+    <h1 class="page-title">Izvjestaj #@Model.Id</h1>
+    <p class="page-subtitle">Detaljni prikaz podataka o izvjestaju.</p>
+</section>
+
+<section class="details-layout">
+    <article class="detail-panel">
+        <h2 class="panel-title">Osnovni podaci</h2>
+        <div class="detail-list">
+            <div class="detail-item"><span class="detail-label">ID</span><span class="detail-value">@Model.Id</span></div>
+            <div class="detail-item"><span class="detail-label">Prosjecna ocjena</span><span class="detail-value">@Model.ProsjecnaOcjena.ToString("0.00")</span></div>
+            <div class="detail-item"><span class="detail-label">Broj ocjena</span><span class="detail-value">@Model.BrojOcjena</span></div>
+            <div class="detail-item"><span class="detail-label">Datum generiranja</span><span class="detail-value">@Model.DatumGeneriranja.ToString("dd.MM.yyyy HH:mm")</span></div>
+        </div>
+    </article>
+
+    <article class="detail-panel">
+        <h2 class="panel-title">Profesor</h2>
+        <div class="detail-list">
+            <div class="detail-item"><span class="detail-label">ID profesora</span><span class="detail-value">@Model.Profesor.Id</span></div>
+            <div class="detail-item"><span class="detail-label">Ime i prezime</span><span class="detail-value">@Model.Profesor.Ime @Model.Profesor.Prezime</span></div>
+            <div class="detail-item"><span class="detail-label">Katedra</span><span class="detail-value">@Model.Profesor.Katedra</span></div>
+        </div>
+        <div class="inline-links">
+            <a class="link-btn" asp-controller="Profesor" asp-action="Details" asp-route-id="@Model.Profesor.Id">Detalji profesora</a>
+        </div>
+    </article>
+</section>
+
+<a class="link-btn link-btn--ghost back-link" asp-action="Index">Povratak na Index</a>

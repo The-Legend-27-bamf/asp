@@ -1,0 +1,37 @@
+@model IEnumerable<Profesor>
+@{
+    ViewData["Title"] = "Profesori";
+    var profesori = new List<Profesor>(Model);
+}
+
+<section class="page-head">
+    <h1 class="page-title">Profesori</h1>
+    <p class="page-subtitle">Pregled profesora s katedrama i aktivnostima.</p>
+</section>
+
+@if (profesori.Count == 0)
+{
+    <p class="empty-note">Nema dostupnih profesora.</p>
+}
+else
+{
+    <section class="cards-grid">
+        @foreach (var profesor in profesori)
+        {
+            <article class="entity-card">
+                <div class="card-top">
+                    <h2 class="card-title">@profesor.Ime @profesor.Prezime</h2>
+                    <span class="chip chip--id">ID @profesor.Id</span>
+                </div>
+                <div class="card-lines">
+                    <p class="card-meta">Katedra: @profesor.Katedra</p>
+                </div>
+                <div class="chip-wrap">
+                    <span class="chip chip--accent">Ocjene: @profesor.Ocjene.Count</span>
+                    <span class="chip chip--ok">Kolegiji: @profesor.Kolegiji.Count</span>
+                </div>
+                <a class="link-btn" asp-action="Details" asp-route-id="@profesor.Id">Details</a>
+            </article>
+        }
+    </section>
+}

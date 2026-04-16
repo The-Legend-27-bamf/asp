@@ -1,0 +1,62 @@
+@model Profesor
+@{
+    ViewData["Title"] = "Detalji profesora";
+}
+
+<section class="page-head">
+    <h1 class="page-title">@Model.Ime @Model.Prezime</h1>
+    <p class="page-subtitle">Detaljni prikaz podataka o profesoru.</p>
+</section>
+
+<section class="details-layout">
+    <article class="detail-panel">
+        <h2 class="panel-title">Osnovni podaci</h2>
+        <div class="detail-list">
+            <div class="detail-item"><span class="detail-label">ID</span><span class="detail-value">@Model.Id</span></div>
+            <div class="detail-item"><span class="detail-label">Ime</span><span class="detail-value">@Model.Ime</span></div>
+            <div class="detail-item"><span class="detail-label">Prezime</span><span class="detail-value">@Model.Prezime</span></div>
+            <div class="detail-item"><span class="detail-label">Katedra</span><span class="detail-value">@Model.Katedra</span></div>
+        </div>
+    </article>
+
+    <article class="detail-panel">
+        <h2 class="panel-title">Ocjene i kolegiji</h2>
+
+        <h3>Ocjene</h3>
+        @if (Model.Ocjene.Count == 0)
+        {
+            <p class="empty-note">Nema ocjena.</p>
+        }
+        else
+        {
+            <ul class="related-list">
+                @foreach (var ocjena in Model.Ocjene)
+                {
+                    <li>
+                        <a asp-controller="Ocjena" asp-action="Details" asp-route-id="@ocjena.Id">
+                            Ocjena @ocjena.Vrijednost (@ocjena.Tip)
+                        </a>
+                        za @ocjena.Student.Ime @ocjena.Student.Prezime
+                    </li>
+                }
+            </ul>
+        }
+
+        <h3>Kolegiji</h3>
+        @if (Model.Kolegiji.Count == 0)
+        {
+            <p class="empty-note">Nema kolegija.</p>
+        }
+        else
+        {
+            <ul class="related-list">
+                @foreach (var kolegij in Model.Kolegiji)
+                {
+                    <li><a asp-controller="Kolegij" asp-action="Details" asp-route-id="@kolegij.Id">@kolegij.Naziv</a></li>
+                }
+            </ul>
+        }
+    </article>
+</section>
+
+<a class="link-btn link-btn--ghost back-link" asp-action="Index">Povratak na Index</a>

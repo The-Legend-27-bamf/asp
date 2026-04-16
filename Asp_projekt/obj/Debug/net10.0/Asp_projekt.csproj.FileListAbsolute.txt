@@ -21,7 +21,6 @@
 /Users/martinsvazic/Desktop/ASP/Asp_projekt/obj/Debug/net10.0/scopedcss/Views/Shared/_Layout.cshtml.rz.scp.css
 /Users/martinsvazic/Desktop/ASP/Asp_projekt/obj/Debug/net10.0/scopedcss/bundle/Asp_projekt.styles.css
 /Users/martinsvazic/Desktop/ASP/Asp_projekt/obj/Debug/net10.0/scopedcss/projectbundle/Asp_projekt.bundle.scp.css
-/Users/martinsvazic/Desktop/ASP/Asp_projekt/obj/Debug/net10.0/compressed/v8r6u1dyiz-{0}-b9sayid5wm-b9sayid5wm.gz
 /Users/martinsvazic/Desktop/ASP/Asp_projekt/obj/Debug/net10.0/compressed/9yoajrgals-{0}-61n19gt1b8-61n19gt1b8.gz
 /Users/martinsvazic/Desktop/ASP/Asp_projekt/obj/Debug/net10.0/compressed/r1u6eiuxdy-{0}-xtxxf3hu2r-xtxxf3hu2r.gz
 /Users/martinsvazic/Desktop/ASP/Asp_projekt/obj/Debug/net10.0/compressed/bgfpyei7ox-{0}-bqjiyaj88i-bqjiyaj88i.gz
@@ -95,3 +94,5 @@
 /Users/martinsvazic/Desktop/ASP/Asp_projekt/obj/Debug/net10.0/Asp_projekt.pdb
 /Users/martinsvazic/Desktop/ASP/Asp_projekt/obj/Debug/net10.0/Asp_projekt.genruntimeconfig.cache
 /Users/martinsvazic/Desktop/ASP/Asp_projekt/obj/Debug/net10.0/ref/Asp_projekt.dll
+/Users/martinsvazic/Desktop/ASP/Asp_projekt/obj/Debug/net10.0/Asp_projekt.sourcelink.json
+/Users/martinsvazic/Desktop/ASP/Asp_projekt/obj/Debug/net10.0/compressed/v8r6u1dyiz-{0}-5w9ozuu4y8-5w9ozuu4y8.gz

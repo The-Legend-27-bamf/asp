@@ -1,0 +1,35 @@
+@model IEnumerable<Izvjestaj>
+@{
+    ViewData["Title"] = "Izvjestaji";
+    var izvjestaji = new List<Izvjestaj>(Model);
+}
+
+<section class="page-head">
+    <h1 class="page-title">Izvjestaji</h1>
+    <p class="page-subtitle">Automatski generirani izvjestaji po profesorima.</p>
+</section>
+
+@if (izvjestaji.Count == 0)
+{
+    <p class="empty-note">Nema dostupnih izvjestaja.</p>
+}
+else
+{
+    <section class="cards-grid">
+        @foreach (var izvjestaj in izvjestaji)
+        {
+            <article class="entity-card">
+                <div class="card-top">
+                    <h2 class="card-title">Izvjestaj #@izvjestaj.Id</h2>
+                    <span class="chip chip--ok">@izvjestaj.ProsjecnaOcjena.ToString("0.00")</span>
+                </div>
+                <div class="card-lines">
+                    <p class="card-meta">Profesor: @izvjestaj.Profesor.Ime @izvjestaj.Profesor.Prezime</p>
+                    <p class="card-meta">Broj ocjena: @izvjestaj.BrojOcjena</p>
+                    <p class="card-meta">Datum: @izvjestaj.DatumGeneriranja.ToString("dd.MM.yyyy HH:mm")</p>
+                </div>
+                <a class="link-btn" asp-action="Details" asp-route-id="@izvjestaj.Id">Details</a>
+            </article>
+        }
+    </section>
+}

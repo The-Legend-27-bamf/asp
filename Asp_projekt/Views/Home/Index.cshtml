@@ -1,8 +1,153 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@model HomeDashboardViewModel
+@{
+    ViewData["Title"] = "Dashboard";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<section class="page-head">
+    <h1 class="page-title">Dashboard</h1>
+    <p class="page-subtitle">Nasumicni pregled podataka po jednom objektu svake vrste.</p>
+</section>
+
+<div class="inline-links" style="margin-bottom: 14px;">
+    <a class="link-btn" asp-controller="Home" asp-action="Index">Osvjezi nasumicni prikaz</a>
 </div>
+
+<section class="cards-grid">
+    <article class="entity-card">
+        <div class="card-top">
+            <h2 class="card-title">Student</h2>
+            @if (Model.Student is not null)
+            {
+                <span class="chip chip--id">ID @Model.Student.Id</span>
+            }
+        </div>
+        @if (Model.Student is null)
+        {
+            <p class="empty-note">Nema podataka.</p>
+        }
+        else
+        {
+            <div class="card-lines">
+                <p class="card-meta">@Model.Student.Ime @Model.Student.Prezime</p>
+                <p class="card-meta">Datum upisa: @Model.Student.DatumUpisa.ToString("dd.MM.yyyy")</p>
+                <p class="card-meta">Broj danih ocjena: @Model.Student.DaneOcjene.Count</p>
+            </div>
+            <a class="link-btn" asp-controller="Student" asp-action="Details" asp-route-id="@Model.Student.Id">Details</a>
+        }
+    </article>
+
+    <article class="entity-card">
+        <div class="card-top">
+            <h2 class="card-title">Kolegij</h2>
+            @if (Model.Kolegij is not null)
+            {
+                <span class="chip chip--id">ID @Model.Kolegij.Id</span>
+            }
+        </div>
+        @if (Model.Kolegij is null)
+        {
+            <p class="empty-note">Nema podataka.</p>
+        }
+        else
+        {
+            <div class="card-lines">
+                <p class="card-meta">@Model.Kolegij.Naziv</p>
+                <p class="card-meta">ECTS: @Model.Kolegij.ECTS</p>
+                <p class="card-meta">Profesori: @Model.Kolegij.Profesori.Count | Studenti: @Model.Kolegij.Studenti.Count</p>
+            </div>
+            <a class="link-btn" asp-controller="Kolegij" asp-action="Details" asp-route-id="@Model.Kolegij.Id">Details</a>
+        }
+    </article>
+
+    <article class="entity-card">
+        <div class="card-top">
+            <h2 class="card-title">Profesor</h2>
+            @if (Model.Profesor is not null)
+            {
+                <span class="chip chip--id">ID @Model.Profesor.Id</span>
+            }
+        </div>
+        @if (Model.Profesor is null)
+        {
+            <p class="empty-note">Nema podataka.</p>
+        }
+        else
+        {
+            <div class="card-lines">
+                <p class="card-meta">@Model.Profesor.Ime @Model.Profesor.Prezime</p>
+                <p class="card-meta">Katedra: @Model.Profesor.Katedra</p>
+                <p class="card-meta">Ocjene: @Model.Profesor.Ocjene.Count | Kolegiji: @Model.Profesor.Kolegiji.Count</p>
+            </div>
+            <a class="link-btn" asp-controller="Profesor" asp-action="Details" asp-route-id="@Model.Profesor.Id">Details</a>
+        }
+    </article>
+
+    <article class="entity-card">
+        <div class="card-top">
+            <h2 class="card-title">Ocjena</h2>
+            @if (Model.Ocjena is not null)
+            {
+                <span class="chip chip--id">ID @Model.Ocjena.Id</span>
+            }
+        </div>
+        @if (Model.Ocjena is null)
+        {
+            <p class="empty-note">Nema podataka.</p>
+        }
+        else
+        {
+            <div class="card-lines">
+                <p class="card-meta">Vrijednost: @Model.Ocjena.Vrijednost (@Model.Ocjena.Tip)</p>
+                <p class="card-meta">Student: @Model.Ocjena.Student.Ime @Model.Ocjena.Student.Prezime</p>
+                <p class="card-meta">Kolegij: @Model.Ocjena.Kolegij.Naziv</p>
+            </div>
+            <a class="link-btn" asp-controller="Ocjena" asp-action="Details" asp-route-id="@Model.Ocjena.Id">Details</a>
+        }
+    </article>
+
+    <article class="entity-card">
+        <div class="card-top">
+            <h2 class="card-title">Fakultet</h2>
+            @if (Model.FakultetId.HasValue)
+            {
+                <span class="chip chip--id">ID @Model.FakultetId.Value</span>
+            }
+        </div>
+        @if (Model.Fakultet is null)
+        {
+            <p class="empty-note">Nema podataka.</p>
+        }
+        else
+        {
+            <div class="card-lines">
+                <p class="card-meta">@Model.Fakultet.Naziv</p>
+                <p class="card-meta">Profesori: @Model.Fakultet.Profesori.Count</p>
+                <p class="card-meta">Studenti: @Model.Fakultet.Studenti.Count | Kolegiji: @Model.Fakultet.Kolegiji.Count</p>
+            </div>
+            <a class="link-btn" asp-controller="Fakultet" asp-action="Details" asp-route-id="@Model.FakultetId">Details</a>
+        }
+    </article>
+
+    <article class="entity-card">
+        <div class="card-top">
+            <h2 class="card-title">Izvjestaj</h2>
+            @if (Model.Izvjestaj is not null)
+            {
+                <span class="chip chip--id">ID @Model.Izvjestaj.Id</span>
+            }
+        </div>
+        @if (Model.Izvjestaj is null)
+        {
+            <p class="empty-note">Nema podataka.</p>
+        }
+        else
+        {
+            <div class="card-lines">
+                <p class="card-meta">Profesor: @Model.Izvjestaj.Profesor.Ime @Model.Izvjestaj.Profesor.Prezime</p>
+                <p class="card-meta">Prosjecna ocjena: @Model.Izvjestaj.ProsjecnaOcjena.ToString("0.00")</p>
+                <p class="card-meta">Broj ocjena: @Model.Izvjestaj.BrojOcjena</p>
+            </div>
+            <a class="link-btn" asp-controller="Izvjestaj" asp-action="Details" asp-route-id="@Model.Izvjestaj.Id">Details</a>
+        }
+    </article>
+</section>

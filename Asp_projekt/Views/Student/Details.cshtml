@@ -1,0 +1,43 @@
+@model Student
+@{
+    ViewData["Title"] = "Detalji studenta";
+}
+
+<section class="page-head">
+    <h1 class="page-title">@Model.Ime @Model.Prezime</h1>
+    <p class="page-subtitle">Detaljni prikaz podataka o studentu.</p>
+</section>
+
+<section class="details-layout">
+    <article class="detail-panel">
+        <h2 class="panel-title">Osnovni podaci</h2>
+        <div class="detail-list">
+            <div class="detail-item"><span class="detail-label">ID</span><span class="detail-value">@Model.Id</span></div>
+            <div class="detail-item"><span class="detail-label">Ime</span><span class="detail-value">@Model.Ime</span></div>
+            <div class="detail-item"><span class="detail-label">Prezime</span><span class="detail-value">@Model.Prezime</span></div>
+            <div class="detail-item"><span class="detail-label">Datum upisa</span><span class="detail-value">@Model.DatumUpisa.ToString("dd.MM.yyyy")</span></div>
+        </div>
+    </article>
+
+    <article class="detail-panel">
+        <h2 class="panel-title">Dane ocjene</h2>
+        @if (Model.DaneOcjene.Count == 0)
+        {
+            <p class="empty-note">Student nema unesenih ocjena.</p>
+        }
+        else
+        {
+            <ul class="related-list">
+                @foreach (var ocjena in Model.DaneOcjene)
+                {
+                    <li>
+                        Ocjena @ocjena.Vrijednost (@ocjena.Tip) | @ocjena.Kolegij.Naziv | @ocjena.DatumOcjene.ToString("dd.MM.yyyy")
+                        <a asp-controller="Ocjena" asp-action="Details" asp-route-id="@ocjena.Id">Detalji ocjene</a>
+                    </li>
+                }
+            </ul>
+        }
+    </article>
+</section>
+
+<a class="link-btn link-btn--ghost back-link" asp-action="Index">Povratak na Index</a>
