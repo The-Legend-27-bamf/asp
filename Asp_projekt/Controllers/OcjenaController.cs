@@ -34,26 +34,41 @@ public class OcjenaController : Controller
         {
             Profesori = _db.Profesori
                 .AsNoTracking()
+                .Include(p => p.Fakultet)
                 .OrderBy(p => p.Prezime)
                 .ThenBy(p => p.Ime)
-                .Select(p => new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem(
-                    $"{p.Ime} {p.Prezime}",
-                    p.Id.ToString()))
+                .Select(p => new OcjenaCreateViewModel.ProfesorOption
+                {
+                    Id = p.Id,
+                    Naziv = $"{p.Ime} {p.Prezime}",
+                    Katedra = p.Katedra,
+                    FakultetNaziv = p.Fakultet != null ? p.Fakultet.Naziv : null
+                })
                 .ToList(),
             Studenti = _db.Studenti
                 .AsNoTracking()
+                .Include(s => s.Fakultet)
                 .OrderBy(s => s.Prezime)
                 .ThenBy(s => s.Ime)
-                .Select(s => new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem(
-                    $"{s.Ime} {s.Prezime}",
-                    s.Id.ToString()))
+                .Select(s => new OcjenaCreateViewModel.StudentOption
+                {
+                    Id = s.Id,
+                    Naziv = $"{s.Ime} {s.Prezime}",
+                    DatumUpisa = s.DatumUpisa,
+                    FakultetNaziv = s.Fakultet != null ? s.Fakultet.Naziv : null
+                })
                 .ToList(),
             Kolegiji = _db.Kolegiji
                 .AsNoTracking()
+                .Include(k => k.Fakultet)
                 .OrderBy(k => k.Naziv)
-                .Select(k => new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem(
-                    k.Naziv,
-                    k.Id.ToString()))
+                .Select(k => new OcjenaCreateViewModel.KolegijOption
+                {
+                    Id = k.Id,
+                    Naziv = k.Naziv,
+                    ECTS = k.ECTS,
+                    FakultetNaziv = k.Fakultet != null ? k.Fakultet.Naziv : null
+                })
                 .ToList()
         };
 
@@ -68,26 +83,41 @@ public class OcjenaController : Controller
         {
             model.Profesori = _db.Profesori
                 .AsNoTracking()
+                .Include(p => p.Fakultet)
                 .OrderBy(p => p.Prezime)
                 .ThenBy(p => p.Ime)
-                .Select(p => new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem(
-                    $"{p.Ime} {p.Prezime}",
-                    p.Id.ToString()))
+                .Select(p => new OcjenaCreateViewModel.ProfesorOption
+                {
+                    Id = p.Id,
+                    Naziv = $"{p.Ime} {p.Prezime}",
+                    Katedra = p.Katedra,
+                    FakultetNaziv = p.Fakultet != null ? p.Fakultet.Naziv : null
+                })
                 .ToList();
             model.Studenti = _db.Studenti
                 .AsNoTracking()
+                .Include(s => s.Fakultet)
                 .OrderBy(s => s.Prezime)
                 .ThenBy(s => s.Ime)
-                .Select(s => new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem(
-                    $"{s.Ime} {s.Prezime}",
-                    s.Id.ToString()))
+                .Select(s => new OcjenaCreateViewModel.StudentOption
+                {
+                    Id = s.Id,
+                    Naziv = $"{s.Ime} {s.Prezime}",
+                    DatumUpisa = s.DatumUpisa,
+                    FakultetNaziv = s.Fakultet != null ? s.Fakultet.Naziv : null
+                })
                 .ToList();
             model.Kolegiji = _db.Kolegiji
                 .AsNoTracking()
+                .Include(k => k.Fakultet)
                 .OrderBy(k => k.Naziv)
-                .Select(k => new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem(
-                    k.Naziv,
-                    k.Id.ToString()))
+                .Select(k => new OcjenaCreateViewModel.KolegijOption
+                {
+                    Id = k.Id,
+                    Naziv = k.Naziv,
+                    ECTS = k.ECTS,
+                    FakultetNaziv = k.Fakultet != null ? k.Fakultet.Naziv : null
+                })
                 .ToList();
 
             return View(model);

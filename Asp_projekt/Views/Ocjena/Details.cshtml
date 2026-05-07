@@ -1,6 +1,10 @@
 @model Ocjena
 @{
     ViewData["Title"] = "Detalji ocjene";
+
+    var filledStars = Model.Vrijednost;
+    if (filledStars < 0) filledStars = 0;
+    if (filledStars > 5) filledStars = 5;
 }
 
 <section class="detail-hero">
@@ -8,24 +12,6 @@
     <div class="hero-main">
         <h1 class="hero-title">Ocjena (@Model.Tip)</h1>
         <p class="hero-subtitle">Detaljni prikaz podataka o ocjeni.</p>
-    </div>
-    <div class="hero-pills">
-        @{
-            var filledStars = Model.Vrijednost;
-            if (filledStars < 0) filledStars = 0;
-            if (filledStars > 5) filledStars = 5;
-        }
-        <span class="chip chip--sun chip--stars" aria-label="Ocjena: @Model.Vrijednost od 5">
-            <span class="stars" aria-hidden="true">
-                @for (var i = 1; i <= 5; i++)
-                {
-                    <svg class="star @(i <= filledStars ? "is-filled" : "is-empty")" viewBox="0 0 24 24" focusable="false" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M12 2.7l2.9 6.1 6.7.9-4.9 4.7 1.2 6.7L12 17.9 6.1 21.1l1.2-6.7-4.9-4.7 6.7-.9L12 2.7Z" />
-                    </svg>
-                }
-            </span>
-        </span>
-        <span class="hero-pill">Datum <strong>@Model.DatumOcjene.ToString("dd.MM.yyyy")</strong></span>
     </div>
 </section>
 

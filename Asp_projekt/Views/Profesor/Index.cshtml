@@ -22,7 +22,13 @@ else
                     <h2 class="card-title">@profesor.Ime @profesor.Prezime</h2>
                 </div>
                 <div class="chip-wrap">
-                    <span class="chip chip--accent">Katedra @profesor.Katedra</span>
+                    @{
+                        var katedra = profesor.Katedra ?? string.Empty;
+                        var katedraLabel = katedra.StartsWith("Katedra", StringComparison.OrdinalIgnoreCase)
+                            ? katedra
+                            : $"Katedra {katedra}";
+                    }
+                    <span class="chip chip--accent">@katedraLabel</span>
                     <span class="chip chip--ok">Ocjene @profesor.Ocjene.Count</span>
                     <span class="chip chip--ok">Kolegiji @profesor.Kolegiji.Count</span>
                 </div>

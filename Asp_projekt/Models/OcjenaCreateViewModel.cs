@@ -5,6 +5,30 @@ namespace Asp_projekt.Models;
 
 public class OcjenaCreateViewModel
 {
+    public sealed class ProfesorOption
+    {
+        public int Id { get; init; }
+        public string Naziv { get; init; } = string.Empty;
+        public string Katedra { get; init; } = string.Empty;
+        public string? FakultetNaziv { get; init; }
+    }
+
+    public sealed class StudentOption
+    {
+        public int Id { get; init; }
+        public string Naziv { get; init; } = string.Empty;
+        public DateTime DatumUpisa { get; init; }
+        public string? FakultetNaziv { get; init; }
+    }
+
+    public sealed class KolegijOption
+    {
+        public int Id { get; init; }
+        public string Naziv { get; init; } = string.Empty;
+        public int ECTS { get; init; }
+        public string? FakultetNaziv { get; init; }
+    }
+
     [Required]
     public int ProfesorId { get; set; }
 
@@ -25,7 +49,7 @@ public class OcjenaCreateViewModel
 
     public DateTime DatumOcjene { get; set; } = DateTime.Today;
 
-    public List<SelectListItem> Profesori { get; set; } = new();
-    public List<SelectListItem> Studenti { get; set; } = new();
-    public List<SelectListItem> Kolegiji { get; set; } = new();
+    public List<ProfesorOption> Profesori { get; set; } = new();
+    public List<StudentOption> Studenti { get; set; } = new();
+    public List<KolegijOption> Kolegiji { get; set; } = new();
 }

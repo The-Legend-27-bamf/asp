@@ -23,8 +23,16 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    var resetOnStartup = builder.Configuration.GetValue<bool>("Database:ResetOnStartup");
+    var seedSets = builder.Configuration.GetValue<int?>("Database:SeedSets") ?? 3;
+
+    if (resetOnStartup)
+    {
+        db.Database.EnsureDeleted();
+    }
+
     db.Database.Migrate();
-    Asp_projekt.Models.MainClass.SeedDatabase(db, sets: 3);
+    Asp_projekt.Models.MainClass.SeedDatabase(db, sets: seedSets);
 }
 
 // Configure the HTTP request pipeline.

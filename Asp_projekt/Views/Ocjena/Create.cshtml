@@ -26,19 +26,74 @@
             <div class="info-grid">
                 <div class="info-item">
                     <label class="info-label" asp-for="ProfesorId">Profesor</label>
-                    <select asp-for="ProfesorId" asp-items="Model.Profesori"></select>
+                    <select asp-for="ProfesorId">
+                        @foreach (var profesor in Model.Profesori)
+                        {
+                            if (Model.ProfesorId == profesor.Id)
+                            {
+                                <option value="@profesor.Id" selected
+                                        data-naziv="@profesor.Naziv"
+                                        data-katedra="@profesor.Katedra"
+                                        data-fakultet="@(profesor.FakultetNaziv ?? string.Empty)">@profesor.Naziv</option>
+                            }
+                            else
+                            {
+                                <option value="@profesor.Id"
+                                        data-naziv="@profesor.Naziv"
+                                        data-katedra="@profesor.Katedra"
+                                        data-fakultet="@(profesor.FakultetNaziv ?? string.Empty)">@profesor.Naziv</option>
+                            }
+                        }
+                    </select>
                     <span asp-validation-for="ProfesorId"></span>
                 </div>
 
                 <div class="info-item">
                     <label class="info-label" asp-for="StudentId">Student</label>
-                    <select asp-for="StudentId" asp-items="Model.Studenti"></select>
+                    <select asp-for="StudentId">
+                        @foreach (var student in Model.Studenti)
+                        {
+                            var datumUpisa = student.DatumUpisa.ToString("yyyy-MM-dd");
+                            if (Model.StudentId == student.Id)
+                            {
+                                <option value="@student.Id" selected
+                                        data-naziv="@student.Naziv"
+                                        data-datum-upisa="@datumUpisa"
+                                        data-fakultet="@(student.FakultetNaziv ?? string.Empty)">@student.Naziv</option>
+                            }
+                            else
+                            {
+                                <option value="@student.Id"
+                                        data-naziv="@student.Naziv"
+                                        data-datum-upisa="@datumUpisa"
+                                        data-fakultet="@(student.FakultetNaziv ?? string.Empty)">@student.Naziv</option>
+                            }
+                        }
+                    </select>
                     <span asp-validation-for="StudentId"></span>
                 </div>
 
                 <div class="info-item">
                     <label class="info-label" asp-for="KolegijId">Kolegij</label>
-                    <select asp-for="KolegijId" asp-items="Model.Kolegiji"></select>
+                    <select asp-for="KolegijId">
+                        @foreach (var kolegij in Model.Kolegiji)
+                        {
+                            if (Model.KolegijId == kolegij.Id)
+                            {
+                                <option value="@kolegij.Id" selected
+                                        data-naziv="@kolegij.Naziv"
+                                        data-ects="@kolegij.ECTS"
+                                        data-fakultet="@(kolegij.FakultetNaziv ?? string.Empty)">@kolegij.Naziv</option>
+                            }
+                            else
+                            {
+                                <option value="@kolegij.Id"
+                                        data-naziv="@kolegij.Naziv"
+                                        data-ects="@kolegij.ECTS"
+                                        data-fakultet="@(kolegij.FakultetNaziv ?? string.Empty)">@kolegij.Naziv</option>
+                            }
+                        }
+                    </select>
                     <span asp-validation-for="KolegijId"></span>
                 </div>
 
@@ -80,6 +135,28 @@
             <span class="card-tag">Info</span>
         </header>
         <div class="card-copy">
+            <p>Trenutni odabir iz padajućih izbornika:</p>
+            <div class="info-grid" id="napomenaSummary" aria-live="polite">
+                <div class="info-item">
+                    <div class="info-label">Profesor</div>
+                    <div><strong id="napProfesorNaziv">—</strong></div>
+                    <div id="napProfesorMeta"></div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Student</div>
+                    <div><strong id="napStudentNaziv">—</strong></div>
+                    <div id="napStudentMeta"></div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Kolegij</div>
+                    <div><strong id="napKolegijNaziv">—</strong></div>
+                    <div id="napKolegijMeta"></div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Tip ocjene</div>
+                    <div><strong id="napTip">—</strong></div>
+                </div>
+            </div>
             <p>Odabrani profesor, student i kolegij moraju postojati u bazi.</p>
             <p>Nakon spremanja, ocjena će se prikazati na listi ocjena.</p>
         </div>
@@ -101,4 +178,83 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        (function () {
+            const professorSelect = document.getElementById('ProfesorId');
+            const studentSelect = document.getElementById('StudentId');
+            const kolegijSelect = document.getElementById('KolegijId');
+            const tipSelect = document.getElementById('Tip');
+
+            const napProfesorNaziv = document.getElementById('napProfesorNaziv');
+            const napProfesorMeta = document.getElementById('napProfesorMeta');
+            const napStudentNaziv = document.getElementById('napStudentNaziv');
+            const napStudentMeta = document.getElementById('napStudentMeta');
+            const napKolegijNaziv = document.getElementById('napKolegijNaziv');
+            const napKolegijMeta = document.getElementById('napKolegijMeta');
+            const napTip = document.getElementById('napTip');
+
+            function selectedOption(selectEl) {
+                if (!selectEl || selectEl.selectedIndex < 0) return null;
+                return selectEl.options[selectEl.selectedIndex] || null;
+            }
+
+            function formatMeta(parts) {
+                const filtered = parts.filter(p => !!p && p.trim().length > 0);
+                return filtered.length ? filtered.join(' · ') : '';
+            }
+
+            function updateNapomena() {
+                const professorOpt = selectedOption(professorSelect);
+                const studentOpt = selectedOption(studentSelect);
+                const kolegijOpt = selectedOption(kolegijSelect);
+                const tipOpt = selectedOption(tipSelect);
+
+                if (napProfesorNaziv) {
+                    napProfesorNaziv.textContent = professorOpt?.dataset?.naziv || professorOpt?.text || '—';
+                }
+                if (napProfesorMeta) {
+                    const meta = formatMeta([
+                        professorOpt?.dataset?.katedra ? `Katedra: ${professorOpt.dataset.katedra}` : '',
+                        professorOpt?.dataset?.fakultet ? `Fakultet: ${professorOpt.dataset.fakultet}` : ''
+                    ]);
+                    napProfesorMeta.textContent = meta;
+                }
+
+                if (napStudentNaziv) {
+                    napStudentNaziv.textContent = studentOpt?.dataset?.naziv || studentOpt?.text || '—';
+                }
+                if (napStudentMeta) {
+                    const meta = formatMeta([
+                        studentOpt?.dataset?.datumUpisa ? `Upis: ${studentOpt.dataset.datumUpisa}` : '',
+                        studentOpt?.dataset?.fakultet ? `Fakultet: ${studentOpt.dataset.fakultet}` : ''
+                    ]);
+                    napStudentMeta.textContent = meta;
+                }
+
+                if (napKolegijNaziv) {
+                    napKolegijNaziv.textContent = kolegijOpt?.dataset?.naziv || kolegijOpt?.text || '—';
+                }
+                if (napKolegijMeta) {
+                    const ects = kolegijOpt?.dataset?.ects ? `ECTS: ${kolegijOpt.dataset.ects}` : '';
+                    const meta = formatMeta([
+                        ects,
+                        kolegijOpt?.dataset?.fakultet ? `Fakultet: ${kolegijOpt.dataset.fakultet}` : ''
+                    ]);
+                    napKolegijMeta.textContent = meta;
+                }
+
+                if (napTip) {
+                    napTip.textContent = tipOpt?.text || '—';
+                }
+            }
+
+            professorSelect?.addEventListener('change', updateNapomena);
+            studentSelect?.addEventListener('change', updateNapomena);
+            kolegijSelect?.addEventListener('change', updateNapomena);
+            tipSelect?.addEventListener('change', updateNapomena);
+
+            updateNapomena();
+        })();
+    </script>
 }
