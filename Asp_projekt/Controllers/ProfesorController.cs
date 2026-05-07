@@ -1,25 +1,42 @@
-using Asp_projekt.Repositories;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Asp_projekt.Data;
 
 namespace Asp_projekt.Controllers;
 
+[Route("[controller]")]
 public class ProfesorController : Controller
 {
-    private readonly ProfesorMockRepository _profesorRepository;
+    private readonly AppDbContext _db;
 
-    public ProfesorController(ProfesorMockRepository profesorRepository)
+    public ProfesorController(AppDbContext db)
     {
-        _profesorRepository = profesorRepository;
+        _db = db;
     }
 
+    [HttpGet("")]
     public IActionResult Index()
     {
-        return View(_profesorRepository.GetAll());
+        var profesori = _db.Profesori
+            .AsNoTracking()
+            .Include(p => p.Ocjene)
+            .Include(p => p.Kolegiji)
+            .ToList();
+
+        return View(profesori);
     }
 
+    [HttpGet("{id:int}")]
     public IActionResult Details(int id)
     {
-        var profesor = _profesorRepository.GetById(id);
+        var profesor = _db.Profesori
+            .AsNoTracking()
+            .Include(p => p.Ocjene)
+                .ThenInclude(o => o.Student)
+            .Include(p => p.Ocjene)
+                .ThenInclude(o => o.Kolegij)
+            .Include(p => p.Kolegiji)
+            .FirstOrDefault(p => p.Id == id);
         if (profesor is null)
         {
             return NotFound();

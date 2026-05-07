@@ -1,17 +1,32 @@
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
 namespace Asp_projekt.Models;
 
 public class Izvjestaj
 {
+    [Key]
     public int Id { get; set; }
-    public Profesor Profesor { get; set; }
+
+    public int ProfesorId { get; set; }
+
+    [ForeignKey(nameof(ProfesorId))]
+    public virtual Profesor Profesor { get; set; }
+
     public double ProsjecnaOcjena { get; set; }
     public int BrojOcjena { get; set; }
     public DateTime DatumGeneriranja { get; set; }
+
+    protected Izvjestaj()
+    {
+        Profesor = null!;
+    }
 
     public Izvjestaj(int id, Profesor profesor,DateTime datumGeneriranja)
     {
         Id = id;
         Profesor = profesor;
+        ProfesorId = profesor.Id;
         DatumGeneriranja = datumGeneriranja;
         ProsjecnaOcjena = IzracunProsjecneOcjene(profesor);
         BrojOcjena = DohvatiBrojOcjena(profesor);

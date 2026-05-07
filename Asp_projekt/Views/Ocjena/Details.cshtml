@@ -3,38 +3,67 @@
     ViewData["Title"] = "Detalji ocjene";
 }
 
-<section class="page-head">
-    <h1 class="page-title">Ocjena @Model.Vrijednost (@Model.Tip)</h1>
-    <p class="page-subtitle">Detaljni prikaz podataka o ocjeni.</p>
+<section class="detail-hero">
+    <span class="hero-badge">Ocjena</span>
+    <div class="hero-main">
+        <h1 class="hero-title">Ocjena (@Model.Tip)</h1>
+        <p class="hero-subtitle">Detaljni prikaz podataka o ocjeni.</p>
+    </div>
+    <div class="hero-pills">
+        @{
+            var filledStars = Model.Vrijednost;
+            if (filledStars < 0) filledStars = 0;
+            if (filledStars > 5) filledStars = 5;
+        }
+        <span class="chip chip--sun chip--stars" aria-label="Ocjena: @Model.Vrijednost od 5">
+            <span class="stars" aria-hidden="true">
+                @for (var i = 1; i <= 5; i++)
+                {
+                    <svg class="star @(i <= filledStars ? "is-filled" : "is-empty")" viewBox="0 0 24 24" focusable="false" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 2.7l2.9 6.1 6.7.9-4.9 4.7 1.2 6.7L12 17.9 6.1 21.1l1.2-6.7-4.9-4.7 6.7-.9L12 2.7Z" />
+                    </svg>
+                }
+            </span>
+        </span>
+        <span class="hero-pill">Datum <strong>@Model.DatumOcjene.ToString("dd.MM.yyyy")</strong></span>
+    </div>
 </section>
 
-<section class="details-layout">
-    <article class="detail-panel">
-        <h2 class="panel-title">Osnovni podaci</h2>
-        <div class="detail-list">
-            <div class="detail-item"><span class="detail-label">ID</span><span class="detail-value">@Model.Id</span></div>
-            <div class="detail-item"><span class="detail-label">Vrijednost</span><span class="detail-value">@Model.Vrijednost</span></div>
-            <div class="detail-item"><span class="detail-label">Tip</span><span class="detail-value">@Model.Tip</span></div>
-            <div class="detail-item"><span class="detail-label">Komentar</span><span class="detail-value">@Model.Komentar</span></div>
-            <div class="detail-item"><span class="detail-label">Datum</span><span class="detail-value">@Model.DatumOcjene.ToString("dd.MM.yyyy")</span></div>
+<section class="detail-grid">
+    <article class="detail-card core-card">
+        <header class="card-header">
+            <h2>Osnovni podaci</h2>
+            <span class="card-tag">Ocjena</span>
+        </header>
+        <div class="info-grid">
+            <div class="info-item">
+                <span class="info-label">Vrijednost</span>
+                <span class="info-value">
+                    <span class="stars" aria-hidden="true">
+                        @for (var i = 1; i <= 5; i++)
+                        {
+                            <svg class="star @(i <= filledStars ? "is-filled" : "is-empty")" viewBox="0 0 24 24" focusable="false" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 2.7l2.9 6.1 6.7.9-4.9 4.7 1.2 6.7L12 17.9 6.1 21.1l1.2-6.7-4.9-4.7 6.7-.9L12 2.7Z" />
+                            </svg>
+                        }
+                    </span>
+                </span>
+            </div>
+            <div class="info-item"><span class="info-label">Tip</span><span class="info-value">@Model.Tip</span></div>
+            <div class="info-item"><span class="info-label">Komentar</span><span class="info-value">@Model.Komentar</span></div>
+            <div class="info-item"><span class="info-label">Datum</span><span class="info-value">@Model.DatumOcjene.ToString("dd.MM.yyyy")</span></div>
         </div>
     </article>
 
-    <article class="detail-panel">
-        <h2 class="panel-title">Povezani entiteti</h2>
-        <div class="detail-list">
-            <div class="detail-item">
-                <span class="detail-label">Profesor</span>
-                <span class="detail-value"><a asp-controller="Profesor" asp-action="Details" asp-route-id="@Model.Profesor.Id">@Model.Profesor.Ime @Model.Profesor.Prezime</a></span>
-            </div>
-            <div class="detail-item">
-                <span class="detail-label">Student</span>
-                <span class="detail-value"><a asp-controller="Student" asp-action="Details" asp-route-id="@Model.Student.Id">@Model.Student.Ime @Model.Student.Prezime</a></span>
-            </div>
-            <div class="detail-item">
-                <span class="detail-label">Kolegij</span>
-                <span class="detail-value"><a asp-controller="Kolegij" asp-action="Details" asp-route-id="@Model.Kolegij.Id">@Model.Kolegij.Naziv</a></span>
-            </div>
+    <article class="detail-card">
+        <header class="card-header">
+            <h2>Povezani entiteti</h2>
+            <span class="card-tag">Veze</span>
+        </header>
+        <div class="chip-list">
+            <a class="name-chip" asp-controller="Profesor" asp-action="Details" asp-route-id="@Model.Profesor.Id">Profesor: @Model.Profesor.Ime @Model.Profesor.Prezime</a>
+            <a class="name-chip" asp-controller="Student" asp-action="Details" asp-route-id="@Model.Student.Id">Student: @Model.Student.Ime @Model.Student.Prezime</a>
+            <a class="name-chip" asp-controller="Kolegij" asp-action="Details" asp-route-id="@Model.Kolegij.Id">Kolegij: @Model.Kolegij.Naziv</a>
         </div>
     </article>
 </section>

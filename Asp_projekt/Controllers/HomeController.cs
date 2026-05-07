@@ -1,45 +1,62 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Asp_projekt.Data;
 using Asp_projekt.Models;
-using Asp_projekt.Repositories;
 
 namespace Asp_projekt.Controllers;
 
+[Route("[controller]")]
 public class HomeController : Controller
 {
-    private readonly StudentMockRepository _studentRepository;
-    private readonly KolegijMockRepository _kolegijRepository;
-    private readonly ProfesorMockRepository _profesorRepository;
-    private readonly OcjenaMockRepository _ocjenaRepository;
-    private readonly FakultetMockRepository _fakultetRepository;
-    private readonly IzvjestajMockRepository _izvjestajRepository;
+    private readonly AppDbContext _db;
 
     public HomeController(
-        StudentMockRepository studentRepository,
-        KolegijMockRepository kolegijRepository,
-        ProfesorMockRepository profesorRepository,
-        OcjenaMockRepository ocjenaRepository,
-        FakultetMockRepository fakultetRepository,
-        IzvjestajMockRepository izvjestajRepository)
+        AppDbContext db)
     {
-        _studentRepository = studentRepository;
-        _kolegijRepository = kolegijRepository;
-        _profesorRepository = profesorRepository;
-        _ocjenaRepository = ocjenaRepository;
-        _fakultetRepository = fakultetRepository;
-        _izvjestajRepository = izvjestajRepository;
+        _db = db;
     }
 
+    [HttpGet("")]
+    [HttpGet("/")]
     public IActionResult Index()
     {
-        var studenti = _studentRepository.GetAll();
-        var kolegiji = _kolegijRepository.GetAll();
-        var profesori = _profesorRepository.GetAll();
-        var ocjene = _ocjenaRepository.GetAll();
-        var fakulteti = _fakultetRepository.GetAll();
-        var izvjestaji = _izvjestajRepository.GetAll();
+        var studenti = _db.Studenti
+            .AsNoTracking()
+            .Include(s => s.DaneOcjene)
+            .ToList();
 
-        var randomFakultetIndex = fakulteti.Count > 0 ? Random.Shared.Next(fakulteti.Count) : -1;
+        var kolegiji = _db.Kolegiji
+            .AsNoTracking()
+            .Include(k => k.Profesori)
+            .Include(k => k.Studenti)
+            .ToList();
+
+        var profesori = _db.Profesori
+            .AsNoTracking()
+            .Include(p => p.Ocjene)
+            .Include(p => p.Kolegiji)
+            .ToList();
+
+        var ocjene = _db.Ocjene
+            .AsNoTracking()
+            .Include(o => o.Student)
+            .Include(o => o.Kolegij)
+            .ToList();
+
+        var fakulteti = _db.Fakulteti
+            .AsNoTracking()
+            .Include(f => f.Profesori)
+            .Include(f => f.Studenti)
+            .Include(f => f.Kolegiji)
+            .ToList();
+
+        var izvjestaji = _db.Izvjestaji
+            .AsNoTracking()
+            .Include(i => i.Profesor)
+            .ToList();
+
+        var randomFakultet = PickRandom(fakulteti);
 
         var model = new HomeDashboardViewModel
         {
@@ -47,20 +64,22 @@ public class HomeController : Controller
             Kolegij = PickRandom(kolegiji),
             Profesor = PickRandom(profesori),
             Ocjena = PickRandom(ocjene),
-            Fakultet = randomFakultetIndex >= 0 ? fakulteti[randomFakultetIndex] : null,
-            FakultetId = randomFakultetIndex >= 0 ? randomFakultetIndex + 1 : null,
+            Fakultet = randomFakultet,
+            FakultetId = randomFakultet?.Id,
             Izvjestaj = PickRandom(izvjestaji)
         };
 
         return View(model);
     }
 
+    [HttpGet("Privacy")]
     public IActionResult Privacy()
     {
         return View();
     }
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+    [HttpGet("Error")]
     public IActionResult Error()
     {
         return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });

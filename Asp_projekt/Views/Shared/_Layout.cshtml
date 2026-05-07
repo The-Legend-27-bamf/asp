@@ -7,14 +7,24 @@
     <script type="importmap"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700&family=Sora:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/Asp_projekt.styles.css" asp-append-version="true" />
 </head>
 <body>
     <header class="app-header">
         <nav class="app-nav app-shell">
-            <a class="app-brand" asp-area="" asp-controller="Home" asp-action="Index">Akademska Evidencija</a>
+            <a class="app-brand" asp-area="" asp-controller="Home" asp-action="Index">
+                <span class="brand-mark" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" role="img" focusable="false" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M4.5 9.2 12 5.5l7.5 3.7L12 12.9 4.5 9.2Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
+                        <path d="M7.2 10.7v4.4c0 1.2 2.2 2.8 4.8 2.8s4.8-1.6 4.8-2.8v-4.4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+                        <path d="M19.5 9.2v5.1" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+                        <path d="M19.5 14.3c-.8.6-1.7.9-2.6.9" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+                    </svg>
+                </span>
+                <span class="brand-name">Akademska Evidencija</span>
+            </a>
             <div class="app-links">
                 <a asp-area="" asp-controller="Student" asp-action="Index">Studenti</a>
                 <a asp-area="" asp-controller="Profesor" asp-action="Index">Profesori</a>

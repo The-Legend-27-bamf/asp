@@ -1,7 +1,6 @@
 @model IEnumerable<Ocjena>
 @{
     ViewData["Title"] = "Ocjene";
-    var ocjene = new List<Ocjena>(Model);
 }
 
 <section class="page-head">
@@ -9,24 +8,44 @@
     <p class="page-subtitle">Sve ocjene s osnovnim informacijama i detaljima.</p>
 </section>
 
-@if (ocjene.Count == 0)
+<section class="page-actions">
+    <a class="link-btn" asp-action="Create">Daj ocjenu</a>
+</section>
+
+@if (@Model == null || !@Model.Any())
 {
     <p class="empty-note">Nema dostupnih ocjena.</p>
 }
 else
 {
     <section class="cards-grid">
-        @foreach (var ocjena in ocjene)
+        @foreach (var ocjena in @Model)
         {
             <article class="entity-card">
                 <div class="card-top">
-                    <h2 class="card-title">Ocjena @ocjena.Vrijednost (@ocjena.Tip)</h2>
-                    <span class="chip chip--id">ID @ocjena.Id</span>
+                    <h2 class="card-title">Ocjena (@ocjena.Tip)</h2>
+                </div>
+
+                <div class="grade-pill-center">
+                    @{ var filledStars = Math.Clamp(ocjena.Vrijednost, 0, 5); }
+                    <span class="chip chip--sun chip--stars" aria-label="Ocjena: @ocjena.Vrijednost od 5">
+                        <span class="stars" aria-hidden="true">
+                            @for (var i = 1; i <= 5; i++)
+                            {
+                                <svg class="star @(i <= filledStars ? "is-filled" : "is-empty")" viewBox="0 0 24 24" focusable="false" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M12 2.7l2.9 6.1 6.7.9-4.9 4.7 1.2 6.7L12 17.9 6.1 21.1l1.2-6.7-4.9-4.7 6.7-.9L12 2.7Z" />
+                                </svg>
+                            }
+                        </span>
+                    </span>
                 </div>
                 <div class="card-lines">
                     <p class="card-meta">Student: @ocjena.Student.Ime @ocjena.Student.Prezime</p>
                     <p class="card-meta">Kolegij: @ocjena.Kolegij.Naziv</p>
-                    <p class="card-meta">Datum: @ocjena.DatumOcjene.ToString("dd.MM.yyyy")</p>
+                </div>
+                <div class="chip-wrap">
+                    <span class="chip chip--accent">Tip @ocjena.Tip</span>
+                    <span class="chip chip--ok">@ocjena.DatumOcjene.ToString("dd.MM.yyyy")</span>
                 </div>
                 <a class="link-btn" asp-action="Details" asp-route-id="@ocjena.Id">Details</a>
             </article>

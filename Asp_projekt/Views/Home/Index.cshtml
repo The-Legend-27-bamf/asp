@@ -3,25 +3,24 @@
     ViewData["Title"] = "Dashboard";
 }
 
-<section class="page-head">
-    <h1 class="page-title">Dashboard</h1>
-    <p class="page-subtitle">Nasumicni pregled podataka po jednom objektu svake vrste.</p>
+<section class="detail-hero">
+    <span class="hero-badge">Dashboard</span>
+    <div class="hero-main">
+        <h1 class="hero-title">Nasumicni pregled</h1>
+        <p class="hero-subtitle">Nasumicni pregled podataka po jednom objektu svake vrste.</p>
+    </div>
 </section>
 
-<div class="inline-links" style="margin-bottom: 14px;">
+<div class="inline-links page-actions">
     <a class="link-btn" asp-controller="Home" asp-action="Index">Osvjezi nasumicni prikaz</a>
 </div>
 
-<section class="cards-grid">
+<section class="home-grid">
     <article class="entity-card">
         <div class="card-top">
             <h2 class="card-title">Student</h2>
-            @if (Model.Student is not null)
-            {
-                <span class="chip chip--id">ID @Model.Student.Id</span>
-            }
         </div>
-        @if (Model.Student is null)
+        @if (@Model.Student is null)
         {
             <p class="empty-note">Nema podataka.</p>
         }
@@ -39,12 +38,8 @@
     <article class="entity-card">
         <div class="card-top">
             <h2 class="card-title">Kolegij</h2>
-            @if (Model.Kolegij is not null)
-            {
-                <span class="chip chip--id">ID @Model.Kolegij.Id</span>
-            }
         </div>
-        @if (Model.Kolegij is null)
+        @if (@Model.Kolegij is null)
         {
             <p class="empty-note">Nema podataka.</p>
         }
@@ -62,12 +57,8 @@
     <article class="entity-card">
         <div class="card-top">
             <h2 class="card-title">Profesor</h2>
-            @if (Model.Profesor is not null)
-            {
-                <span class="chip chip--id">ID @Model.Profesor.Id</span>
-            }
         </div>
-        @if (Model.Profesor is null)
+        @if (@Model.Profesor is null)
         {
             <p class="empty-note">Nema podataka.</p>
         }
@@ -85,19 +76,32 @@
     <article class="entity-card">
         <div class="card-top">
             <h2 class="card-title">Ocjena</h2>
-            @if (Model.Ocjena is not null)
-            {
-                <span class="chip chip--id">ID @Model.Ocjena.Id</span>
-            }
         </div>
-        @if (Model.Ocjena is null)
+        @if (@Model.Ocjena is null)
         {
             <p class="empty-note">Nema podataka.</p>
         }
         else
         {
+            <div class="grade-pill-center">
+                @{
+                    var filledStars = Model.Ocjena.Vrijednost;
+                    if (filledStars < 0) filledStars = 0;
+                    if (filledStars > 5) filledStars = 5;
+                }
+                <span class="chip chip--sun chip--stars" aria-label="Ocjena: @Model.Ocjena.Vrijednost od 5">
+                    <span class="stars" aria-hidden="true">
+                        @for (var i = 1; i <= 5; i++)
+                        {
+                            <svg class="star @(i <= filledStars ? "is-filled" : "is-empty")" viewBox="0 0 24 24" focusable="false" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 2.7l2.9 6.1 6.7.9-4.9 4.7 1.2 6.7L12 17.9 6.1 21.1l1.2-6.7-4.9-4.7 6.7-.9L12 2.7Z" />
+                            </svg>
+                        }
+                    </span>
+                </span>
+            </div>
             <div class="card-lines">
-                <p class="card-meta">Vrijednost: @Model.Ocjena.Vrijednost (@Model.Ocjena.Tip)</p>
+                <p class="card-meta">Tip: @Model.Ocjena.Tip</p>
                 <p class="card-meta">Student: @Model.Ocjena.Student.Ime @Model.Ocjena.Student.Prezime</p>
                 <p class="card-meta">Kolegij: @Model.Ocjena.Kolegij.Naziv</p>
             </div>
@@ -108,12 +112,8 @@
     <article class="entity-card">
         <div class="card-top">
             <h2 class="card-title">Fakultet</h2>
-            @if (Model.FakultetId.HasValue)
-            {
-                <span class="chip chip--id">ID @Model.FakultetId.Value</span>
-            }
         </div>
-        @if (Model.Fakultet is null)
+        @if (@Model.Fakultet is null)
         {
             <p class="empty-note">Nema podataka.</p>
         }
@@ -131,12 +131,8 @@
     <article class="entity-card">
         <div class="card-top">
             <h2 class="card-title">Izvjestaj</h2>
-            @if (Model.Izvjestaj is not null)
-            {
-                <span class="chip chip--id">ID @Model.Izvjestaj.Id</span>
-            }
         </div>
-        @if (Model.Izvjestaj is null)
+        @if (@Model.Izvjestaj is null)
         {
             <p class="empty-note">Nema podataka.</p>
         }

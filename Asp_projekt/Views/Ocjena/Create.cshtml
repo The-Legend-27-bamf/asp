@@ -1,0 +1,95 @@
+@model Asp_projekt.Models.OcjenaCreateViewModel
+@using Asp_projekt.Models
+@{
+    ViewData["Title"] = "Daj ocjenu";
+}
+
+<section class="detail-hero">
+    <span class="hero-badge">Ocjena</span>
+    <div class="hero-main">
+        <h1 class="hero-title">Daj ocjenu</h1>
+        <p class="hero-subtitle">Unesi novu ocjenu za odabranog profesora, studenta i kolegij.</p>
+    </div>
+    <div class="hero-pills">
+        <span class="hero-pill">Vrijednost <strong>1–5</strong></span>
+        <span class="hero-pill">Tip <strong>@Model.Tip</strong></span>
+    </div>
+</section>
+
+<section class="detail-grid">
+    <article class="detail-card core-card">
+        <header class="card-header">
+            <h2>Podaci</h2>
+            <span class="card-tag">Create</span>
+        </header>
+
+        <form asp-action="Create" method="post">
+            @Html.AntiForgeryToken()
+            <div asp-validation-summary="ModelOnly"></div>
+
+            <div class="info-grid">
+                <div class="info-item">
+                    <label class="info-label" asp-for="ProfesorId">Profesor</label>
+                    <select asp-for="ProfesorId" asp-items="Model.Profesori"></select>
+                    <span asp-validation-for="ProfesorId"></span>
+                </div>
+
+                <div class="info-item">
+                    <label class="info-label" asp-for="StudentId">Student</label>
+                    <select asp-for="StudentId" asp-items="Model.Studenti"></select>
+                    <span asp-validation-for="StudentId"></span>
+                </div>
+
+                <div class="info-item">
+                    <label class="info-label" asp-for="KolegijId">Kolegij</label>
+                    <select asp-for="KolegijId" asp-items="Model.Kolegiji"></select>
+                    <span asp-validation-for="KolegijId"></span>
+                </div>
+
+                <div class="info-item">
+                    <label class="info-label" asp-for="Tip">Tip ocjene</label>
+                    <select asp-for="Tip" asp-items="Html.GetEnumSelectList<TipOcjene>()"></select>
+                    <span asp-validation-for="Tip"></span>
+                </div>
+
+                <div class="info-item">
+                    <label class="info-label" asp-for="Vrijednost">Vrijednost (1–5)</label>
+                    <input asp-for="Vrijednost" type="number" min="1" max="5" />
+                    <span asp-validation-for="Vrijednost"></span>
+                </div>
+
+                <div class="info-item">
+                    <label class="info-label" asp-for="DatumOcjene">Datum</label>
+                    <input asp-for="DatumOcjene" type="date" />
+                    <span asp-validation-for="DatumOcjene"></span>
+                </div>
+
+                <div class="info-item">
+                    <label class="info-label" asp-for="Komentar">Komentar</label>
+                    <textarea asp-for="Komentar" rows="3"></textarea>
+                    <span asp-validation-for="Komentar"></span>
+                </div>
+            </div>
+
+            <div class="inline-links inline-links--spaced">
+                <button class="link-btn" type="submit">Spremi</button>
+                <a class="link-btn link-btn--ghost" asp-action="Index">Odustani</a>
+            </div>
+        </form>
+    </article>
+
+    <article class="detail-card">
+        <header class="card-header">
+            <h2>Napomena</h2>
+            <span class="card-tag">Info</span>
+        </header>
+        <div class="card-copy">
+            <p>Odabrani profesor, student i kolegij moraju postojati u bazi.</p>
+            <p>Nakon spremanja, ocjena će se prikazati na listi ocjena.</p>
+        </div>
+    </article>
+</section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

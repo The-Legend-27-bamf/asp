@@ -1,25 +1,37 @@
-using Asp_projekt.Repositories;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Asp_projekt.Data;
 
 namespace Asp_projekt.Controllers;
 
+[Route("[controller]")]
 public class IzvjestajController : Controller
 {
-    private readonly IzvjestajMockRepository _izvjestajRepository;
+    private readonly AppDbContext _db;
 
-    public IzvjestajController(IzvjestajMockRepository izvjestajRepository)
+    public IzvjestajController(AppDbContext db)
     {
-        _izvjestajRepository = izvjestajRepository;
+        _db = db;
     }
 
+    [HttpGet("")]
     public IActionResult Index()
     {
-        return View(_izvjestajRepository.GetAll());
+        var izvjestaji = _db.Izvjestaji
+            .AsNoTracking()
+            .Include(i => i.Profesor)
+            .ToList();
+
+        return View(izvjestaji);
     }
 
+    [HttpGet("{id:int}")]
     public IActionResult Details(int id)
     {
-        var izvjestaj = _izvjestajRepository.GetById(id);
+        var izvjestaj = _db.Izvjestaji
+            .AsNoTracking()
+            .Include(i => i.Profesor)
+            .FirstOrDefault(i => i.Id == id);
         if (izvjestaj is null)
         {
             return NotFound();

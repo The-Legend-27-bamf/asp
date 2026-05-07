@@ -1,4 +1,5 @@
-using Asp_projekt.Repositories;
+using Asp_projekt.Data;
+using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -9,12 +10,12 @@ builder.Services.AddControllersWithViews()
     {
         options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
     });
-builder.Services.AddSingleton<StudentMockRepository>();
-builder.Services.AddSingleton<KolegijMockRepository>();
-builder.Services.AddSingleton<ProfesorMockRepository>();
-builder.Services.AddSingleton<OcjenaMockRepository>();
-builder.Services.AddSingleton<FakultetMockRepository>();
-builder.Services.AddSingleton<IzvjestajMockRepository>();
+
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
+    ?? throw new InvalidOperationException("Missing connection string: ConnectionStrings:DefaultConnection");
+
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseSqlServer(connectionString));
 
 var app = builder.Build();
 
@@ -34,6 +35,8 @@ app.UseRouting();
 app.UseAuthorization();
 
 app.MapStaticAssets();
+
+app.MapControllers();
 
 app.MapControllerRoute(
     name: "default",

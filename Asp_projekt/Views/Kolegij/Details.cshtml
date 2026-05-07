@@ -3,52 +3,72 @@
     ViewData["Title"] = "Detalji kolegija";
 }
 
-<section class="page-head">
-    <h1 class="page-title">@Model.Naziv</h1>
-    <p class="page-subtitle">Detaljni prikaz podataka o kolegiju.</p>
+<section class="kolegij-hero">
+    <span class="hero-badge">Kolegij</span>
+    <div class="hero-main">
+        <h1 class="hero-title">@Model.Naziv</h1>
+        <p class="hero-subtitle">Detaljni prikaz podataka o kolegiju.</p>
+    </div>
+    <div class="hero-pills">
+        <span class="hero-pill">ECTS <strong>@Model.ECTS</strong></span>
+    </div>
 </section>
 
-<section class="details-layout">
-    <article class="detail-panel">
-        <h2 class="panel-title">Osnovni podaci</h2>
-        <div class="detail-list">
-            <div class="detail-item"><span class="detail-label">ID</span><span class="detail-value">@Model.Id</span></div>
-            <div class="detail-item"><span class="detail-label">Naziv</span><span class="detail-value">@Model.Naziv</span></div>
-            <div class="detail-item"><span class="detail-label">ECTS</span><span class="detail-value">@Model.ECTS</span></div>
+<section class="kolegij-grid">
+    <article class="kolegij-card core-card">
+        <header class="card-header">
+            <h2>Osnovni podaci</h2>
+            <span class="card-tag">Glavno</span>
+        </header>
+        <div class="info-grid">
+            <div class="info-item">
+                <span class="info-label">Naziv</span>
+                <span class="info-value">@Model.Naziv</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">ECTS</span>
+                <span class="info-value">@Model.ECTS</span>
+            </div>
         </div>
     </article>
 
-    <article class="detail-panel">
-        <h2 class="panel-title">Povezani podaci</h2>
-
-        <h3>Profesori</h3>
-        @if (Model.Profesori.Count == 0)
+    <article class="kolegij-card">
+        <header class="card-header">
+            <h2>Profesori</h2>
+            <span class="card-tag">Mentori</span>
+        </header>
+        @if (@Model.Profesori.Count == 0)
         {
-            <p class="empty-note">Nema profesora.</p>
+            <p class="empty-state">Nema profesora.</p>
         }
         else
         {
-            <ul class="related-list">
-                @foreach (var profesor in Model.Profesori)
+            <div class="chip-list">
+                @foreach (var profesor in @Model.Profesori)
                 {
-                    <li><a asp-controller="Profesor" asp-action="Details" asp-route-id="@profesor.Id">@profesor.Ime @profesor.Prezime</a></li>
+                    <a class="name-chip" asp-controller="Profesor" asp-action="Details" asp-route-id="@profesor.Id">@profesor.Ime @profesor.Prezime</a>
                 }
-            </ul>
+            </div>
         }
+    </article>
 
-        <h3>Studenti</h3>
-        @if (Model.Studenti.Count == 0)
+    <article class="kolegij-card">
+        <header class="card-header">
+            <h2>Studenti</h2>
+            <span class="card-tag">Polaznici</span>
+        </header>
+        @if (@Model.Studenti.Count == 0)
         {
-            <p class="empty-note">Nema studenata.</p>
+            <p class="empty-state">Nema studenata.</p>
         }
         else
         {
-            <ul class="related-list">
-                @foreach (var student in Model.Studenti)
+            <div class="chip-list">
+                @foreach (var student in @Model.Studenti)
                 {
-                    <li><a asp-controller="Student" asp-action="Details" asp-route-id="@student.Id">@student.Ime @student.Prezime</a></li>
+                    <a class="name-chip" asp-controller="Student" asp-action="Details" asp-route-id="@student.Id">@student.Ime @student.Prezime</a>
                 }
-            </ul>
+            </div>
         }
     </article>
 </section>
