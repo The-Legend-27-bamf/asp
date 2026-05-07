@@ -10,12 +10,12 @@ public class AppDbContext : DbContext
     {
     }
 
-    public DbSet<Fakultet> Fakulteti => Set<Fakultet>();
-    public DbSet<Profesor> Profesori => Set<Profesor>();
-    public DbSet<Student> Studenti => Set<Student>();
-    public DbSet<Kolegij> Kolegiji => Set<Kolegij>();
-    public DbSet<Ocjena> Ocjene => Set<Ocjena>();
-    public DbSet<Izvjestaj> Izvjestaji => Set<Izvjestaj>();
+    public DbSet<Fakultet> Fakulteti { get; set; }
+    public DbSet<Profesor> Profesori { get; set; }
+    public DbSet<Student> Studenti { get; set; }
+    public DbSet<Kolegij> Kolegiji { get; set; }
+    public DbSet<Ocjena> Ocjene { get; set; }
+    public DbSet<Izvjestaj> Izvjestaji { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

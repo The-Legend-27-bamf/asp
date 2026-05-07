@@ -47,7 +47,15 @@ else
                     <span class="chip chip--accent">Tip @ocjena.Tip</span>
                     <span class="chip chip--ok">@ocjena.DatumOcjene.ToString("dd.MM.yyyy")</span>
                 </div>
-                <a class="link-btn" asp-action="Details" asp-route-id="@ocjena.Id">Details</a>
+
+                <div class="inline-links">
+                    <a class="link-btn" asp-action="Details" asp-route-id="@ocjena.Id">Details</a>
+                    <form asp-action="Delete" asp-route-id="@ocjena.Id" method="post">
+                        <button class="link-btn link-btn--ghost" type="submit" onclick="return confirm('Obrisati ovu ocjenu?');">
+                            Obriši
+                        </button>
+                    </form>
+                </div>
             </article>
         }
     </section>

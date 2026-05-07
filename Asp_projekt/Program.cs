@@ -1,5 +1,6 @@
 using Asp_projekt.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -19,7 +20,12 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 var app = builder.Build();
 
-Asp_projekt.Models.MainClass.Run();
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    db.Database.Migrate();
+    Asp_projekt.Models.MainClass.SeedDatabase(db, sets: 3);
+}
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

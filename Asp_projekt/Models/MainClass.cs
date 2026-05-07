@@ -1,143 +1,158 @@
+using Asp_projekt.Data;
+using Microsoft.EntityFrameworkCore;
+
 namespace Asp_projekt.Models;
 
-public class MainClass
+public static class MainClass
 {
-    public static void Run()
+    public static void SeedDatabase(AppDbContext db, int sets = 3)
     {
-        // --- Profesori ---
-        var profesor1 = new Profesor(1, "Ivan", "Horvat", "Katedra za matematiku");
-        var profesor2 = new Profesor(2, "Marija", "Kovač", "Katedra za fiziku");
-        var profesor3 = new Profesor(3, "Tomislav", "Babić", "Katedra za informatiku");
-
-        // --- Studenti ---
-        var student1 = new Student(1, "Ana", "Novak", new DateTime(2022, 10, 1));
-        var student2 = new Student(2, "Luka", "Perić", new DateTime(2021, 10, 1));
-        var student3 = new Student(3, "Sara", "Jurić", new DateTime(2023, 10, 1));
-
-        // --- Kolegiji ---
-        var kolegij1 = new Kolegij(1, "Matematika 1", 6);
-        kolegij1.Profesori.Add(profesor1);
-        kolegij1.Studenti.Add(student1);
-
-        var kolegij2 = new Kolegij(2, "Fizika 1", 5);
-        kolegij2.Profesori.Add(profesor2);
-        kolegij2.Studenti.Add(student2);
-
-        var kolegij3 = new Kolegij(3, "Algoritmi i strukture podataka", 7);
-        kolegij3.Profesori.Add(profesor3);
-        kolegij3.Studenti.Add(student3);
-
-        // --- Ocjene ---
-        var ocjena1 = new Ocjena(1, 5, "Odličan rad", new DateTime(2024, 1, 15), TipOcjene.Predavanje, profesor1, student1, kolegij1);
-        var ocjena2 = new Ocjena(2, 4, "Vrlo dobar", new DateTime(2024, 2, 20), TipOcjene.Komunikacija, profesor2, student2, kolegij2);
-        var ocjena3 = new Ocjena(3, 3, "Dobar", new DateTime(2024, 3, 10), TipOcjene.UkupniDojam, profesor3, student3, kolegij3);
-        var ocjena4 = new Ocjena(4, 5, "Izvrsna predavanja", new DateTime(2024, 4, 5), TipOcjene.Organizacija, profesor1, student2, kolegij1);
-        var ocjena5 = new Ocjena(5, 4, "Dobri materijali", new DateTime(2024, 5, 12), TipOcjene.Materijali, profesor2, student3, kolegij2);
-        var ocjena6 = new Ocjena(6, 2, "Potrebno poboljšanje", new DateTime(2024, 6, 18), TipOcjene.UkupniDojam, profesor3, student1, kolegij3);
-
-        // Dodaj ocjene profesorima i studentima
-        profesor1.Ocjene.Add(ocjena1);
-        profesor1.Ocjene.Add(ocjena4);
-        profesor2.Ocjene.Add(ocjena2);
-        profesor2.Ocjene.Add(ocjena5);
-        profesor3.Ocjene.Add(ocjena3);
-        profesor3.Ocjene.Add(ocjena6);
-
-        student1.DaneOcjene.Add(ocjena1);
-        student1.DaneOcjene.Add(ocjena6);
-        student2.DaneOcjene.Add(ocjena2);
-        student2.DaneOcjene.Add(ocjena4);
-        student3.DaneOcjene.Add(ocjena3);
-        student3.DaneOcjene.Add(ocjena5);
-
-        // Dodaj kolegije profesorima
-        profesor1.Kolegiji.Add(kolegij1);
-        profesor2.Kolegiji.Add(kolegij2);
-        profesor3.Kolegiji.Add(kolegij3);
-
-        // --- Fakulteti ---
-        var fakultet1 = new Fakultet("Fakultet prirodnih znanosti");
-        fakultet1.Profesori.Add(profesor1);
-        fakultet1.Studenti.Add(student1);
-        fakultet1.Kolegiji.Add(kolegij1);
-
-        var fakultet2 = new Fakultet("Tehnički fakultet");
-        fakultet2.Profesori.Add(profesor2);
-        fakultet2.Studenti.Add(student2);
-        fakultet2.Kolegiji.Add(kolegij2);
-
-        var fakultet3 = new Fakultet("Fakultet informatike");
-        fakultet3.Profesori.Add(profesor3);
-        fakultet3.Studenti.Add(student3);
-        fakultet3.Kolegiji.Add(kolegij3);
-
-        // --- Administrator ---
-        var administrator = new Administrator("admin", "admin");
-
-        // --- Izvještaji ---
-        var izvjestaj1 = administrator.GenerirajIzvjestaj(1, profesor1, DateTime.Now);
-        var izvjestaj2 = administrator.GenerirajIzvjestaj(2, profesor2, DateTime.Now);
-        var izvjestaj3 = administrator.GenerirajIzvjestaj(3, profesor3, DateTime.Now);
-
-        // --- Prosječne ocjene profesora (LINQ) ---
-        var profesori = new List<Profesor> { profesor1, profesor2, profesor3 };
-
-        var prosjecneOcjene = profesori.Select(p => new
+        if (sets <= 0)
         {
-            Ime = $"{p.Ime} {p.Prezime}",
-            ProsjecnaOcjena = p.Ocjene.Any() ? p.Ocjene.Average(o => o.Vrijednost) : 0
-        });
-
-        foreach (var item in prosjecneOcjene)
-        {
-            Console.WriteLine($"Profesor: {item.Ime} | Prosječna ocjena: {item.ProsjecnaOcjena:F2}");
+            return;
         }
 
-        // --- Profesor s najboljim ocjenama (LINQ) ---
-        var najboljiProfesor = profesori
-            .Where(p => p.Ocjene.Any())
-            .OrderByDescending(p => p.Ocjene.Average(o => o.Vrijednost))
-            .First();
-
-        Console.WriteLine($"\nProfesor s najboljim ocjenama: {najboljiProfesor.Ime} {najboljiProfesor.Prezime} | Prosječna ocjena: {najboljiProfesor.Ocjene.Average(o => o.Vrijednost):F2}");
-
-        // --- Profesori s prosječnom ocjenom manjom od 3 (LINQ) ---
-        var profesoriIspodProsjeka = profesori
-            .Where(p => p.Ocjene.Any() && p.Ocjene.Average(o => o.Vrijednost) < 3)
-            .ToList();
-
-        Console.WriteLine("\nProfesori s prosječnom ocjenom manjom od 3:");
-        foreach (var p in profesoriIspodProsjeka)
+        if (db.Profesori.AsNoTracking().Any()
+            || db.Studenti.AsNoTracking().Any()
+            || db.Kolegiji.AsNoTracking().Any()
+            || db.Fakulteti.AsNoTracking().Any()
+            || db.Ocjene.AsNoTracking().Any()
+            || db.Izvjestaji.AsNoTracking().Any())
         {
-            Console.WriteLine($"  {p.Ime} {p.Prezime} | Prosječna ocjena: {p.Ocjene.Average(o => o.Vrijednost):F2}");
+            return;
         }
 
-        // --- Ocjene grupirane po TipOcjene (LINQ) ---
-        var ocjene = new List<Ocjena> { ocjena1, ocjena2, ocjena3, ocjena4, ocjena5, ocjena6 };
+        var fakulteti = new List<Fakultet>();
+        var profesori = new List<Profesor>();
+        var studenti = new List<Student>();
+        var kolegiji = new List<Kolegij>();
 
-        var ocjenePoTipu = ocjene.GroupBy(o => o.Tip);
-
-        Console.WriteLine("\nOcjene grupirane po tipu:");
-        foreach (var grupa in ocjenePoTipu)
+        var baseProfesori = new (string Ime, string Prezime, string Katedra)[]
         {
-            Console.WriteLine($"  Tip: {grupa.Key}");
-            foreach (var o in grupa)
+            ("Ivan", "Horvat", "Katedra za matematiku"),
+            ("Marija", "Kovač", "Katedra za fiziku"),
+            ("Tomislav", "Babić", "Katedra za informatiku")
+        };
+
+        var baseStudenti = new (string Ime, string Prezime, DateTime DatumUpisa)[]
+        {
+            ("Ana", "Novak", new DateTime(2022, 10, 1)),
+            ("Luka", "Perić", new DateTime(2021, 10, 1)),
+            ("Sara", "Jurić", new DateTime(2023, 10, 1))
+        };
+
+        var baseKolegiji = new (string Naziv, int Ects)[]
+        {
+            ("Matematika 1", 6),
+            ("Fizika 1", 5),
+            ("Algoritmi i strukture podataka", 7)
+        };
+
+        var baseFakulteti = new[]
+        {
+            "Fakultet prirodnih znanosti",
+            "Tehnički fakultet",
+            "Fakultet informatike"
+        };
+
+        for (var setIndex = 1; setIndex <= sets; setIndex++)
+        {
+            for (var i = 0; i < 3; i++)
             {
-                Console.WriteLine($"    Id: {o.Id} | Vrijednost: {o.Vrijednost} | Komentar: {o.Komentar}");
+                var suffix = setIndex == 1 ? string.Empty : $" ({setIndex})";
+
+                var fakultet = new Fakultet($"{baseFakulteti[i]}{suffix}");
+
+                var profesorData = baseProfesori[i];
+                var profesor = new Profesor(0, profesorData.Ime, profesorData.Prezime + suffix, profesorData.Katedra)
+                {
+                    Fakultet = fakultet
+                };
+
+                var studentData = baseStudenti[i];
+                var student = new Student(0, studentData.Ime, studentData.Prezime + suffix, studentData.DatumUpisa.AddYears(setIndex - 1))
+                {
+                    Fakultet = fakultet
+                };
+
+                var kolegijData = baseKolegiji[i];
+                var kolegij = new Kolegij(0, $"{kolegijData.Naziv}{suffix}", kolegijData.Ects)
+                {
+                    Fakultet = fakultet
+                };
+
+                fakultet.Profesori.Add(profesor);
+                fakultet.Studenti.Add(student);
+                fakultet.Kolegiji.Add(kolegij);
+
+                kolegij.Profesori.Add(profesor);
+                profesor.Kolegiji.Add(kolegij);
+
+                student.Kolegij = kolegij;
+                kolegij.Studenti.Add(student);
+
+                fakulteti.Add(fakultet);
+                profesori.Add(profesor);
+                studenti.Add(student);
+                kolegiji.Add(kolegij);
             }
         }
 
-        // --- Studenti sortirani po broju DaneOcjene silazno (LINQ) ---
-        var studenti = new List<Student> { student1, student2, student3 };
+        // Save principal entities first, so identity IDs are generated.
+        db.Fakulteti.AddRange(fakulteti);
+        db.SaveChanges();
 
-        var studentiPoOcjenama = studenti
-            .OrderByDescending(s => s.DaneOcjene.Count)
+        var ocjene = new List<Ocjena>();
+
+        for (var setIndex = 1; setIndex <= sets; setIndex++)
+        {
+            var offset = (setIndex - 1) * 3;
+            var p1 = profesori[offset + 0];
+            var p2 = profesori[offset + 1];
+            var p3 = profesori[offset + 2];
+
+            var s1 = studenti[offset + 0];
+            var s2 = studenti[offset + 1];
+            var s3 = studenti[offset + 2];
+
+            var k1 = kolegiji[offset + 0];
+            var k2 = kolegiji[offset + 1];
+            var k3 = kolegiji[offset + 2];
+
+            var baseDate = new DateTime(2024, 1, 15).AddMonths((setIndex - 1) * 2);
+
+            var o1 = new Ocjena(0, 5, "Odličan rad", baseDate, TipOcjene.Predavanje, p1, s1, k1);
+            var o2 = new Ocjena(0, 4, "Vrlo dobar", baseDate.AddDays(10), TipOcjene.Komunikacija, p2, s2, k2);
+            var o3 = new Ocjena(0, 3, "Dobar", baseDate.AddDays(20), TipOcjene.UkupniDojam, p3, s3, k3);
+            var o4 = new Ocjena(0, 5, "Izvrsna predavanja", baseDate.AddDays(30), TipOcjene.Organizacija, p1, s2, k1);
+            var o5 = new Ocjena(0, 4, "Dobri materijali", baseDate.AddDays(40), TipOcjene.Materijali, p2, s3, k2);
+            var o6 = new Ocjena(0, 2, "Potrebno poboljšanje", baseDate.AddDays(50), TipOcjene.UkupniDojam, p3, s1, k3);
+
+            p1.Ocjene.Add(o1);
+            p2.Ocjene.Add(o2);
+            p3.Ocjene.Add(o3);
+            p1.Ocjene.Add(o4);
+            p2.Ocjene.Add(o5);
+            p3.Ocjene.Add(o6);
+
+            s1.DaneOcjene.Add(o1);
+            s2.DaneOcjene.Add(o2);
+            s3.DaneOcjene.Add(o3);
+            s2.DaneOcjene.Add(o4);
+            s3.DaneOcjene.Add(o5);
+            s1.DaneOcjene.Add(o6);
+
+            ocjene.AddRange([o1, o2, o3, o4, o5, o6]);
+        }
+
+        db.Ocjene.AddRange(ocjene);
+        db.SaveChanges();
+
+        var izvjestaji = profesori
+            .Select(p => new Izvjestaj(0, p, DateTime.Today))
             .ToList();
 
-        Console.WriteLine("\nStudenti sortirani po broju ocjena (silazno):");
-        foreach (var s in studentiPoOcjenama)
-        {
-            Console.WriteLine($"  {s.Ime} {s.Prezime} | Broj ocjena: {s.DaneOcjene.Count}");
-        }
+        db.Izvjestaji.AddRange(izvjestaji);
+        db.SaveChanges();
     }
 }

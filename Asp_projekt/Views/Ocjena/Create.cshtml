@@ -10,10 +10,6 @@
         <h1 class="hero-title">Daj ocjenu</h1>
         <p class="hero-subtitle">Unesi novu ocjenu za odabranog profesora, studenta i kolegij.</p>
     </div>
-    <div class="hero-pills">
-        <span class="hero-pill">Vrijednost <strong>1–5</strong></span>
-        <span class="hero-pill">Tip <strong>@Model.Tip</strong></span>
-    </div>
 </section>
 
 <section class="detail-grid">
@@ -86,6 +82,19 @@
         <div class="card-copy">
             <p>Odabrani profesor, student i kolegij moraju postojati u bazi.</p>
             <p>Nakon spremanja, ocjena će se prikazati na listi ocjena.</p>
+        </div>
+    </article>
+
+    <article class="detail-card">
+        <header class="card-header">
+            <h2>Smjernice</h2>
+            <span class="card-tag">Hint</span>
+        </header>
+        <div class="card-copy">
+            <p><strong>Vrijednost</strong> se unosi u rasponu <strong>1–5</strong>.</p>
+            <p><strong>Tip ocjene</strong> odaberi prema kontekstu (npr. ispit, projekt, laboratorij).</p>
+            <p><strong>Komentar</strong> je opcionalan, ali pomaže pri kasnijem pregledu.</p>
+            <p><strong>Datum</strong> koristi datum kada je ocjena dodijeljena.</p>
         </div>
     </article>
 </section>

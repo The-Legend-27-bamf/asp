@@ -143,4 +143,20 @@ public class OcjenaController : Controller
 
         return View(ocjena);
     }
+
+    [HttpPost("Delete/{id:int}")]
+    [ValidateAntiForgeryToken]
+    public IActionResult Delete(int id)
+    {
+        var ocjena = _db.Ocjene.FirstOrDefault(o => o.Id == id);
+        if (ocjena is null)
+        {
+            return NotFound();
+        }
+
+        _db.Ocjene.Remove(ocjena);
+        _db.SaveChanges();
+
+        return RedirectToAction(nameof(Index));
+    }
 }

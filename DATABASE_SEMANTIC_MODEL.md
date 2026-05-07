@@ -171,6 +171,14 @@ These exist in `Asp_projekt/Models` but are not part of the EF Core schema in `A
 - `MainClass`
 - `OcjenaCreateViewModel`
 
+## Runtime behaviors (not schema)
+
+These behaviors do not change the schema, but they affect how data gets into (and out of) the database when running the app:
+
+- On application startup, EF Core migrations are applied via `db.Database.Migrate()`.
+- When the database is empty, the app seeds sample data (see `Asp_projekt.Models.MainClass.SeedDatabase`).
+- The UI supports deleting individual `Ocjena` records; this removes only the selected row from `Ocjene`.
+
 ## Mermaid ER diagram (optional)
 
 ```mermaid

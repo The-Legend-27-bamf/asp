@@ -15,7 +15,7 @@ Because both are enabled, most actions are reachable through their attribute rou
 - Controller: `HomeController`
 - Action: `Index`
 - View: `Views/Home/Index.cshtml`
-- Route source: conventional default route (`controller=Home`, `action=Index`)
+- Route source: attribute route (`[HttpGet("/")]` on `HomeController.Index`) + conventional default route
 
 ### GET /Home
 - Controller: `HomeController`
@@ -124,6 +124,12 @@ Because both are enabled, most actions are reachable through their attribute rou
 - Action: `Create(OcjenaCreateViewModel model)`
 - View: `Views/Ocjena/Create.cshtml` (on validation errors)
 
+### POST /Ocjena/Delete/{id:int}
+- Controller: `OcjenaController`
+- Action: `Delete(int id)`
+- View: none (redirects to `Index`)
+- Notes: requires anti-forgery token (`[ValidateAntiForgeryToken]`)
+
 ### GET /Ocjena/{id:int}
 - Controller: `OcjenaController`
 - Action: `Details(int id)`
@@ -133,6 +139,7 @@ Because both are enabled, most actions are reachable through their attribute rou
 - GET /Ocjena/Index
 - GET /Ocjena/Create
 - GET /Ocjena/Details/{id?}
+- POST /Ocjena/Delete/{id?}
 
 ## Izvjestaj
 
