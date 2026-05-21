@@ -45,6 +45,8 @@ public class OcjenaController : Controller
     {
         if (!ModelState.IsValid)
         {
+            ViewData["ToastMessage"] = "Unos ocjene nije uspio. Provjerite podatke.";
+            ViewData["ToastType"] = "error";
             PopulateCreateOptions(model);
 
             return View(model);
@@ -53,19 +55,31 @@ public class OcjenaController : Controller
         var profesor = _db.Profesori.FirstOrDefault(p => p.Id == model.ProfesorId);
         if (profesor is null)
         {
-            return NotFound();
+            ModelState.AddModelError(nameof(model.ProfesorId), "Odabrani profesor ne postoji.");
+            ViewData["ToastMessage"] = "Unos ocjene nije uspio. Odabrani profesor ne postoji.";
+            ViewData["ToastType"] = "warning";
+            PopulateCreateOptions(model);
+            return View(model);
         }
 
         var student = _db.Studenti.FirstOrDefault(s => s.Id == model.StudentId);
         if (student is null)
         {
-            return NotFound();
+            ModelState.AddModelError(nameof(model.StudentId), "Odabrani student ne postoji.");
+            ViewData["ToastMessage"] = "Unos ocjene nije uspio. Odabrani student ne postoji.";
+            ViewData["ToastType"] = "warning";
+            PopulateCreateOptions(model);
+            return View(model);
         }
 
         var kolegij = _db.Kolegiji.FirstOrDefault(k => k.Id == model.KolegijId);
         if (kolegij is null)
         {
-            return NotFound();
+            ModelState.AddModelError(nameof(model.KolegijId), "Odabrani kolegij ne postoji.");
+            ViewData["ToastMessage"] = "Unos ocjene nije uspio. Odabrani kolegij ne postoji.";
+            ViewData["ToastType"] = "warning";
+            PopulateCreateOptions(model);
+            return View(model);
         }
 
         var ocjena = new Ocjena(
@@ -80,6 +94,9 @@ public class OcjenaController : Controller
 
         _db.Ocjene.Add(ocjena);
         _db.SaveChanges();
+
+        TempData["ToastMessage"] = "Ocjena je uspjesno kreirana.";
+        TempData["ToastType"] = "success";
 
         return RedirectToAction(nameof(Index));
     }
@@ -122,6 +139,8 @@ public class OcjenaController : Controller
 
         if (!ModelState.IsValid)
         {
+            ViewData["ToastMessage"] = "Azuriranje ocjene nije uspjelo. Provjerite podatke.";
+            ViewData["ToastType"] = "error";
             PopulateEditOptions(model);
             return View(model);
         }
@@ -138,6 +157,8 @@ public class OcjenaController : Controller
         if (!profesorExists || !studentExists || !kolegijExists)
         {
             ModelState.AddModelError(string.Empty, "Odabrani profesor, student ili kolegij vise ne postoji.");
+            ViewData["ToastMessage"] = "Azuriranje ocjene nije uspjelo. Povezani podaci ne postoje.";
+            ViewData["ToastType"] = "warning";
             PopulateEditOptions(model);
             return View(model);
         }
@@ -151,6 +172,9 @@ public class OcjenaController : Controller
         ocjena.DatumOcjene = model.DatumOcjene;
 
         _db.SaveChanges();
+
+        TempData["ToastMessage"] = "Ocjena je uspjesno azurirana.";
+        TempData["ToastType"] = "success";
 
         return RedirectToAction(nameof(Details), new { id = ocjena.Id });
     }
@@ -184,6 +208,9 @@ public class OcjenaController : Controller
 
         _db.Ocjene.Remove(ocjena);
         _db.SaveChanges();
+
+        TempData["ToastMessage"] = "Ocjena je uspjesno obrisana.";
+        TempData["ToastType"] = "success";
 
         return RedirectToAction(nameof(Index));
     }

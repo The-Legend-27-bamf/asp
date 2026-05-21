@@ -69,6 +69,8 @@ public class FakultetController : Controller
     {
         if (!ModelState.IsValid)
         {
+            ViewData["ToastMessage"] = "Unos fakulteta nije uspio. Provjerite podatke.";
+            ViewData["ToastType"] = "error";
             return View(model);
         }
 
@@ -76,12 +78,17 @@ public class FakultetController : Controller
         if (exists)
         {
             ModelState.AddModelError(nameof(model.Naziv), "Fakultet s tim nazivom vec postoji.");
+            ViewData["ToastMessage"] = "Unos fakulteta nije uspio. Fakultet vec postoji.";
+            ViewData["ToastType"] = "warning";
             return View(model);
         }
 
         var fakultet = new Fakultet(model.Naziv.Trim());
         _db.Fakulteti.Add(fakultet);
         _db.SaveChanges();
+
+        TempData["ToastMessage"] = "Fakultet je uspjesno kreiran.";
+        TempData["ToastType"] = "success";
 
         return RedirectToAction(nameof(Index));
     }
@@ -117,6 +124,8 @@ public class FakultetController : Controller
 
         if (!ModelState.IsValid)
         {
+            ViewData["ToastMessage"] = "Azuriranje fakulteta nije uspjelo. Provjerite podatke.";
+            ViewData["ToastType"] = "error";
             return View(model);
         }
 
@@ -131,11 +140,16 @@ public class FakultetController : Controller
         if (duplicate)
         {
             ModelState.AddModelError(nameof(model.Naziv), "Fakultet s tim nazivom vec postoji.");
+            ViewData["ToastMessage"] = "Azuriranje fakulteta nije uspjelo. Fakultet vec postoji.";
+            ViewData["ToastType"] = "warning";
             return View(model);
         }
 
         fakultet.Naziv = naziv;
         _db.SaveChanges();
+
+        TempData["ToastMessage"] = "Fakultet je uspjesno azuriran.";
+        TempData["ToastType"] = "success";
 
         return RedirectToAction(nameof(Details), new { id = fakultet.Id });
     }
@@ -189,6 +203,9 @@ public class FakultetController : Controller
 
         _db.Fakulteti.Remove(fakultet);
         _db.SaveChanges();
+
+        TempData["ToastMessage"] = "Fakultet je uspjesno obrisan.";
+        TempData["ToastType"] = "success";
 
         return RedirectToAction(nameof(Index));
     }

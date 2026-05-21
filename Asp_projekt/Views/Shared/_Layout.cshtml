@@ -17,6 +17,8 @@
         var currentController = (ViewContext.RouteData.Values["controller"]?.ToString() ?? string.Empty);
         Func<string, string> navClass = controller =>
             string.Equals(currentController, controller, StringComparison.OrdinalIgnoreCase) ? "is-active" : string.Empty;
+        var toastMessage = (TempData["ToastMessage"] as string) ?? (ViewData["ToastMessage"] as string);
+        var toastType = (TempData["ToastType"] as string) ?? (ViewData["ToastType"] as string) ?? "success";
     }
     <header class="app-header">
         <nav class="app-nav app-shell">
@@ -53,6 +55,17 @@
             &copy; 2026 Akademska Evidencija
         </div>
     </footer>
+
+    @if (!string.IsNullOrWhiteSpace(toastMessage))
+    {
+        <div id="app-toast"
+             class="app-toast"
+             hidden
+             data-toast-message="@toastMessage"
+             data-toast-type="@toastType"
+             role="status"
+             aria-live="polite"></div>
+    }
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>

@@ -73,6 +73,8 @@ public class KolegijController : Controller
     {
         if (!ModelState.IsValid)
         {
+            ViewData["ToastMessage"] = "Unos kolegija nije uspio. Provjerite podatke.";
+            ViewData["ToastType"] = "error";
             PopulateKolegijCreateOptions(model);
             return View(model);
         }
@@ -80,6 +82,8 @@ public class KolegijController : Controller
         if (model.FakultetId.HasValue && !_db.Fakulteti.Any(f => f.Id == model.FakultetId.Value))
         {
             ModelState.AddModelError(nameof(model.FakultetId), "Odabrani fakultet ne postoji.");
+            ViewData["ToastMessage"] = "Unos kolegija nije uspio. Odabrani fakultet ne postoji.";
+            ViewData["ToastType"] = "warning";
             PopulateKolegijCreateOptions(model);
             return View(model);
         }
@@ -94,6 +98,9 @@ public class KolegijController : Controller
 
         _db.Kolegiji.Add(kolegij);
         _db.SaveChanges();
+
+        TempData["ToastMessage"] = "Kolegij je uspjesno kreiran.";
+        TempData["ToastType"] = "success";
 
         return RedirectToAction(nameof(Index));
     }
@@ -132,6 +139,8 @@ public class KolegijController : Controller
 
         if (!ModelState.IsValid)
         {
+            ViewData["ToastMessage"] = "Azuriranje kolegija nije uspjelo. Provjerite podatke.";
+            ViewData["ToastType"] = "error";
             PopulateKolegijEditOptions(model);
             return View(model);
         }
@@ -139,6 +148,8 @@ public class KolegijController : Controller
         if (model.FakultetId.HasValue && !_db.Fakulteti.Any(f => f.Id == model.FakultetId.Value))
         {
             ModelState.AddModelError(nameof(model.FakultetId), "Odabrani fakultet ne postoji.");
+            ViewData["ToastMessage"] = "Azuriranje kolegija nije uspjelo. Odabrani fakultet ne postoji.";
+            ViewData["ToastType"] = "warning";
             PopulateKolegijEditOptions(model);
             return View(model);
         }
@@ -154,6 +165,9 @@ public class KolegijController : Controller
         kolegij.FakultetId = model.FakultetId;
 
         _db.SaveChanges();
+
+        TempData["ToastMessage"] = "Kolegij je uspjesno azuriran.";
+        TempData["ToastType"] = "success";
 
         return RedirectToAction(nameof(Details), new { id = kolegij.Id });
     }
@@ -193,6 +207,9 @@ public class KolegijController : Controller
 
         _db.Kolegiji.Remove(kolegij);
         _db.SaveChanges();
+
+        TempData["ToastMessage"] = "Kolegij je uspjesno obrisan.";
+        TempData["ToastType"] = "success";
 
         return RedirectToAction(nameof(Index));
     }

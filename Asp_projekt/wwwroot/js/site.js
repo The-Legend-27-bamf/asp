@@ -1,4 +1,39 @@
 ﻿(function () {
+	function showToast(message, type) {
+		const text = (message || '').trim();
+		if (!text) {
+			return;
+		}
+
+		let toast = document.getElementById('app-toast');
+		if (!toast) {
+			toast = document.createElement('div');
+			toast.id = 'app-toast';
+			toast.className = 'app-toast';
+			toast.hidden = true;
+			toast.setAttribute('role', 'status');
+			toast.setAttribute('aria-live', 'polite');
+			document.body.appendChild(toast);
+		}
+
+		const safeType = (type || 'success').trim();
+		toast.classList.remove('is-success', 'is-warning', 'is-error', 'is-visible');
+		toast.textContent = text;
+		toast.classList.add('is-' + safeType);
+		toast.hidden = false;
+
+		window.requestAnimationFrame(function () {
+			toast.classList.add('is-visible');
+		});
+
+		window.setTimeout(function () {
+			toast.classList.remove('is-visible');
+			window.setTimeout(function () {
+				toast.hidden = true;
+			}, 300);
+		}, 2800);
+	}
+
 	function animateCards(container) {
 		if (!container) {
 			return;
@@ -83,6 +118,7 @@
 							return;
 						}
 						target.innerHTML = '<p class="empty-note">Dogodila se greska pri pretrazi.</p>';
+						showToast('Pretraga trenutno nije dostupna. Pokusajte ponovno.', 'error');
 					})
 					.finally(function () {
 						target.classList.remove('is-loading');
@@ -203,6 +239,7 @@
 							return;
 						}
 						clearMenu();
+						showToast('Autocomplete trenutno nije dostupan.', 'warning');
 					});
 			}, 220);
 
@@ -308,11 +345,27 @@
 		});
 	}
 
+	function initToast() {
+		const toast = document.getElementById('app-toast');
+		if (!toast) {
+			return;
+		}
+
+		const message = (toast.dataset.toastMessage || '').trim();
+		if (!message) {
+			return;
+		}
+
+		const type = (toast.dataset.toastType || 'success').trim();
+		showToast(message, type);
+	}
+
 	document.addEventListener('DOMContentLoaded', function () {
 		initAjaxListSearch();
 		initAutocompleteDropdowns();
 		initDateTimePickers();
 		initFormMicroFeedback();
+		initToast();
 		document.querySelectorAll('[id$="ListTarget"]').forEach(function (target) {
 			animateCards(target);
 		});

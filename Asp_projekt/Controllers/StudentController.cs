@@ -37,6 +37,8 @@ public class StudentController : Controller
     {
         if (!ModelState.IsValid)
         {
+            ViewData["ToastMessage"] = "Unos studenta nije uspio. Provjerite podatke.";
+            ViewData["ToastType"] = "error";
             PopulateStudentCreateOptions(model);
             return View(model);
         }
@@ -44,6 +46,8 @@ public class StudentController : Controller
         if (model.FakultetId.HasValue && !_db.Fakulteti.Any(f => f.Id == model.FakultetId.Value))
         {
             ModelState.AddModelError(nameof(model.FakultetId), "Odabrani fakultet ne postoji.");
+            ViewData["ToastMessage"] = "Unos studenta nije uspio. Odabrani fakultet ne postoji.";
+            ViewData["ToastType"] = "warning";
             PopulateStudentCreateOptions(model);
             return View(model);
         }
@@ -51,6 +55,8 @@ public class StudentController : Controller
         if (model.KolegijId.HasValue && !_db.Kolegiji.Any(k => k.Id == model.KolegijId.Value))
         {
             ModelState.AddModelError(nameof(model.KolegijId), "Odabrani kolegij ne postoji.");
+            ViewData["ToastMessage"] = "Unos studenta nije uspio. Odabrani kolegij ne postoji.";
+            ViewData["ToastType"] = "warning";
             PopulateStudentCreateOptions(model);
             return View(model);
         }
@@ -67,6 +73,9 @@ public class StudentController : Controller
 
         _db.Studenti.Add(student);
         _db.SaveChanges();
+
+        TempData["ToastMessage"] = "Student je uspjesno kreiran.";
+        TempData["ToastType"] = "success";
 
         return RedirectToAction(nameof(Index));
     }
@@ -146,6 +155,8 @@ public class StudentController : Controller
 
         if (!ModelState.IsValid)
         {
+            ViewData["ToastMessage"] = "Azuriranje studenta nije uspjelo. Provjerite podatke.";
+            ViewData["ToastType"] = "error";
             PopulateStudentEditOptions(model);
             return View(model);
         }
@@ -153,6 +164,8 @@ public class StudentController : Controller
         if (model.FakultetId.HasValue && !_db.Fakulteti.Any(f => f.Id == model.FakultetId.Value))
         {
             ModelState.AddModelError(nameof(model.FakultetId), "Odabrani fakultet ne postoji.");
+            ViewData["ToastMessage"] = "Azuriranje studenta nije uspjelo. Odabrani fakultet ne postoji.";
+            ViewData["ToastType"] = "warning";
             PopulateStudentEditOptions(model);
             return View(model);
         }
@@ -160,6 +173,8 @@ public class StudentController : Controller
         if (model.KolegijId.HasValue && !_db.Kolegiji.Any(k => k.Id == model.KolegijId.Value))
         {
             ModelState.AddModelError(nameof(model.KolegijId), "Odabrani kolegij ne postoji.");
+            ViewData["ToastMessage"] = "Azuriranje studenta nije uspjelo. Odabrani kolegij ne postoji.";
+            ViewData["ToastType"] = "warning";
             PopulateStudentEditOptions(model);
             return View(model);
         }
@@ -177,6 +192,9 @@ public class StudentController : Controller
         student.KolegijId = model.KolegijId;
 
         _db.SaveChanges();
+
+        TempData["ToastMessage"] = "Student je uspjesno azuriran.";
+        TempData["ToastType"] = "success";
 
         return RedirectToAction(nameof(Details), new { id = student.Id });
     }
@@ -211,6 +229,9 @@ public class StudentController : Controller
 
         _db.Studenti.Remove(student);
         _db.SaveChanges();
+
+        TempData["ToastMessage"] = "Student je uspjesno obrisan.";
+        TempData["ToastType"] = "success";
 
         return RedirectToAction(nameof(Index));
     }

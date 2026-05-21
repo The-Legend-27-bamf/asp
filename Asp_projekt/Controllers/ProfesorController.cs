@@ -79,6 +79,8 @@ public class ProfesorController : Controller
     {
         if (!ModelState.IsValid)
         {
+            ViewData["ToastMessage"] = "Unos profesora nije uspio. Provjerite podatke.";
+            ViewData["ToastType"] = "error";
             PopulateProfesorCreateOptions(model);
             return View(model);
         }
@@ -89,6 +91,8 @@ public class ProfesorController : Controller
             if (!fakultetExists)
             {
                 ModelState.AddModelError(nameof(model.FakultetId), "Odabrani fakultet ne postoji.");
+                ViewData["ToastMessage"] = "Unos profesora nije uspio. Odabrani fakultet ne postoji.";
+                ViewData["ToastType"] = "warning";
                 PopulateProfesorCreateOptions(model);
                 return View(model);
             }
@@ -105,6 +109,9 @@ public class ProfesorController : Controller
 
         _db.Profesori.Add(profesor);
         _db.SaveChanges();
+
+        TempData["ToastMessage"] = "Profesor je uspjesno kreiran.";
+        TempData["ToastType"] = "success";
 
         return RedirectToAction(nameof(Index));
     }
@@ -144,6 +151,8 @@ public class ProfesorController : Controller
 
         if (!ModelState.IsValid)
         {
+            ViewData["ToastMessage"] = "Azuriranje profesora nije uspjelo. Provjerite podatke.";
+            ViewData["ToastType"] = "error";
             PopulateProfesorEditOptions(model);
             return View(model);
         }
@@ -154,6 +163,8 @@ public class ProfesorController : Controller
             if (!fakultetExists)
             {
                 ModelState.AddModelError(nameof(model.FakultetId), "Odabrani fakultet ne postoji.");
+                ViewData["ToastMessage"] = "Azuriranje profesora nije uspjelo. Odabrani fakultet ne postoji.";
+                ViewData["ToastType"] = "warning";
                 PopulateProfesorEditOptions(model);
                 return View(model);
             }
@@ -171,6 +182,9 @@ public class ProfesorController : Controller
         profesor.FakultetId = model.FakultetId;
 
         _db.SaveChanges();
+
+        TempData["ToastMessage"] = "Profesor je uspjesno azuriran.";
+        TempData["ToastType"] = "success";
 
         return RedirectToAction(nameof(Details), new { id = profesor.Id });
     }
@@ -206,6 +220,9 @@ public class ProfesorController : Controller
 
         _db.Profesori.Remove(profesor);
         _db.SaveChanges();
+
+        TempData["ToastMessage"] = "Profesor je uspjesno obrisan.";
+        TempData["ToastType"] = "success";
 
         return RedirectToAction(nameof(Index));
     }
