@@ -1,0 +1,40 @@
+@model IEnumerable<Profesor>
+
+@if (@Model == null || !@Model.Any())
+{
+    <p class="empty-note">Nema dostupnih profesora za odabrani filter.</p>
+}
+else
+{
+    <section class="cards-grid" data-ajax-animated-list>
+        @foreach (var profesor in @Model)
+        {
+            <article class="entity-card">
+                <div class="card-top">
+                    <h2 class="card-title">@profesor.Ime @profesor.Prezime</h2>
+                </div>
+                <div class="chip-wrap">
+                    @{
+                        var katedra = profesor.Katedra ?? string.Empty;
+                        var katedraLabel = katedra.StartsWith("Katedra", StringComparison.OrdinalIgnoreCase)
+                            ? katedra
+                            : $"Katedra {katedra}";
+                    }
+                    <span class="chip chip--accent">@katedraLabel</span>
+                    <span class="chip chip--ok">Ocjene @profesor.Ocjene.Count</span>
+                    <span class="chip chip--ok">Kolegiji @profesor.Kolegiji.Count</span>
+                </div>
+                <div class="inline-links">
+                    <a class="link-btn" asp-action="Details" asp-route-id="@profesor.Id">Details</a>
+                    <a class="link-btn link-btn--ghost" asp-action="Edit" asp-route-id="@profesor.Id">Uredi</a>
+                    <form asp-action="Delete" asp-route-id="@profesor.Id" method="post">
+                        @Html.AntiForgeryToken()
+                        <button class="link-btn link-btn--ghost" type="submit" onclick="return confirm('Obrisati ovog profesora?');">
+                            Obrisi
+                        </button>
+                    </form>
+                </div>
+            </article>
+        }
+    </section>
+}

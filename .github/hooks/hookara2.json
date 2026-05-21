@@ -3,7 +3,7 @@
 		"PreToolUse": [
 			{
 				"type": "command",
-				"command": "bash -c \"cat >> ~/Desktop/ASP/agent_log3.txt\""
+				"command": "bash -c \"cat >> ~/Desktop/ASP/agent_log4.txt\""
 			}
 		]
 	}

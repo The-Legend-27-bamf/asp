@@ -54,4 +54,7 @@
     </article>
 </section>
 
-<a class="link-btn link-btn--ghost back-link" asp-action="Index">Povratak na Index</a>
+<div class="inline-links inline-links--spaced">
+    <a class="link-btn" asp-action="Edit" asp-route-id="@Model.Id">Uredi ocjenu</a>
+    <a class="link-btn link-btn--ghost" asp-action="Index">Povratak na Index</a>
+</div>

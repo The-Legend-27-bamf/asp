@@ -18,59 +18,23 @@ public class OcjenaController : Controller
     [HttpGet("")]
     public IActionResult Index()
     {
-        var ocjene = _db.Ocjene
-            .AsNoTracking()
-            .Include(o => o.Student)
-            .Include(o => o.Kolegij)
-            .ToList();
+        var ocjene = BuildOcjenaQuery(null).ToList();
 
         return View(ocjene);
+    }
+
+    [HttpGet("Search")]
+    public IActionResult Search(string? q)
+    {
+        var ocjene = BuildOcjenaQuery(q).ToList();
+        return PartialView("_OcjenaCards", ocjene);
     }
 
     [HttpGet("Create")]
     public IActionResult Create()
     {
-        var model = new OcjenaCreateViewModel
-        {
-            Profesori = _db.Profesori
-                .AsNoTracking()
-                .Include(p => p.Fakultet)
-                .OrderBy(p => p.Prezime)
-                .ThenBy(p => p.Ime)
-                .Select(p => new OcjenaCreateViewModel.ProfesorOption
-                {
-                    Id = p.Id,
-                    Naziv = $"{p.Ime} {p.Prezime}",
-                    Katedra = p.Katedra,
-                    FakultetNaziv = p.Fakultet != null ? p.Fakultet.Naziv : null
-                })
-                .ToList(),
-            Studenti = _db.Studenti
-                .AsNoTracking()
-                .Include(s => s.Fakultet)
-                .OrderBy(s => s.Prezime)
-                .ThenBy(s => s.Ime)
-                .Select(s => new OcjenaCreateViewModel.StudentOption
-                {
-                    Id = s.Id,
-                    Naziv = $"{s.Ime} {s.Prezime}",
-                    DatumUpisa = s.DatumUpisa,
-                    FakultetNaziv = s.Fakultet != null ? s.Fakultet.Naziv : null
-                })
-                .ToList(),
-            Kolegiji = _db.Kolegiji
-                .AsNoTracking()
-                .Include(k => k.Fakultet)
-                .OrderBy(k => k.Naziv)
-                .Select(k => new OcjenaCreateViewModel.KolegijOption
-                {
-                    Id = k.Id,
-                    Naziv = k.Naziv,
-                    ECTS = k.ECTS,
-                    FakultetNaziv = k.Fakultet != null ? k.Fakultet.Naziv : null
-                })
-                .ToList()
-        };
+        var model = new OcjenaCreateViewModel();
+        PopulateCreateOptions(model);
 
         return View(model);
     }
@@ -81,44 +45,7 @@ public class OcjenaController : Controller
     {
         if (!ModelState.IsValid)
         {
-            model.Profesori = _db.Profesori
-                .AsNoTracking()
-                .Include(p => p.Fakultet)
-                .OrderBy(p => p.Prezime)
-                .ThenBy(p => p.Ime)
-                .Select(p => new OcjenaCreateViewModel.ProfesorOption
-                {
-                    Id = p.Id,
-                    Naziv = $"{p.Ime} {p.Prezime}",
-                    Katedra = p.Katedra,
-                    FakultetNaziv = p.Fakultet != null ? p.Fakultet.Naziv : null
-                })
-                .ToList();
-            model.Studenti = _db.Studenti
-                .AsNoTracking()
-                .Include(s => s.Fakultet)
-                .OrderBy(s => s.Prezime)
-                .ThenBy(s => s.Ime)
-                .Select(s => new OcjenaCreateViewModel.StudentOption
-                {
-                    Id = s.Id,
-                    Naziv = $"{s.Ime} {s.Prezime}",
-                    DatumUpisa = s.DatumUpisa,
-                    FakultetNaziv = s.Fakultet != null ? s.Fakultet.Naziv : null
-                })
-                .ToList();
-            model.Kolegiji = _db.Kolegiji
-                .AsNoTracking()
-                .Include(k => k.Fakultet)
-                .OrderBy(k => k.Naziv)
-                .Select(k => new OcjenaCreateViewModel.KolegijOption
-                {
-                    Id = k.Id,
-                    Naziv = k.Naziv,
-                    ECTS = k.ECTS,
-                    FakultetNaziv = k.Fakultet != null ? k.Fakultet.Naziv : null
-                })
-                .ToList();
+            PopulateCreateOptions(model);
 
             return View(model);
         }
@@ -157,6 +84,77 @@ public class OcjenaController : Controller
         return RedirectToAction(nameof(Index));
     }
 
+    [HttpGet("Edit/{id:int}")]
+    public IActionResult Edit(int id)
+    {
+        var ocjena = _db.Ocjene
+            .AsNoTracking()
+            .FirstOrDefault(o => o.Id == id);
+        if (ocjena is null)
+        {
+            return NotFound();
+        }
+
+        var model = new OcjenaEditViewModel
+        {
+            Id = ocjena.Id,
+            ProfesorId = ocjena.ProfesorId,
+            StudentId = ocjena.StudentId,
+            KolegijId = ocjena.KolegijId,
+            Vrijednost = ocjena.Vrijednost,
+            Tip = ocjena.Tip,
+            Komentar = ocjena.Komentar,
+            DatumOcjene = ocjena.DatumOcjene
+        };
+        PopulateEditOptions(model);
+
+        return View(model);
+    }
+
+    [HttpPost("Edit/{id:int}")]
+    [ValidateAntiForgeryToken]
+    public IActionResult Edit(int id, OcjenaEditViewModel model)
+    {
+        if (id != model.Id)
+        {
+            return NotFound();
+        }
+
+        if (!ModelState.IsValid)
+        {
+            PopulateEditOptions(model);
+            return View(model);
+        }
+
+        var ocjena = _db.Ocjene.FirstOrDefault(o => o.Id == id);
+        if (ocjena is null)
+        {
+            return NotFound();
+        }
+
+        var profesorExists = _db.Profesori.Any(p => p.Id == model.ProfesorId);
+        var studentExists = _db.Studenti.Any(s => s.Id == model.StudentId);
+        var kolegijExists = _db.Kolegiji.Any(k => k.Id == model.KolegijId);
+        if (!profesorExists || !studentExists || !kolegijExists)
+        {
+            ModelState.AddModelError(string.Empty, "Odabrani profesor, student ili kolegij vise ne postoji.");
+            PopulateEditOptions(model);
+            return View(model);
+        }
+
+        ocjena.ProfesorId = model.ProfesorId;
+        ocjena.StudentId = model.StudentId;
+        ocjena.KolegijId = model.KolegijId;
+        ocjena.Vrijednost = model.Vrijednost;
+        ocjena.Tip = model.Tip;
+        ocjena.Komentar = model.Komentar;
+        ocjena.DatumOcjene = model.DatumOcjene;
+
+        _db.SaveChanges();
+
+        return RedirectToAction(nameof(Details), new { id = ocjena.Id });
+    }
+
     [HttpGet("{id:int}")]
     public IActionResult Details(int id)
     {
@@ -188,5 +186,120 @@ public class OcjenaController : Controller
         _db.SaveChanges();
 
         return RedirectToAction(nameof(Index));
+    }
+
+    private void PopulateCreateOptions(OcjenaCreateViewModel model)
+    {
+        model.Profesori = _db.Profesori
+            .AsNoTracking()
+            .Include(p => p.Fakultet)
+            .OrderBy(p => p.Prezime)
+            .ThenBy(p => p.Ime)
+            .Select(p => new OcjenaCreateViewModel.ProfesorOption
+            {
+                Id = p.Id,
+                Naziv = $"{p.Ime} {p.Prezime}",
+                Katedra = p.Katedra,
+                FakultetNaziv = p.Fakultet != null ? p.Fakultet.Naziv : null
+            })
+            .ToList();
+
+        model.Studenti = _db.Studenti
+            .AsNoTracking()
+            .Include(s => s.Fakultet)
+            .OrderBy(s => s.Prezime)
+            .ThenBy(s => s.Ime)
+            .Select(s => new OcjenaCreateViewModel.StudentOption
+            {
+                Id = s.Id,
+                Naziv = $"{s.Ime} {s.Prezime}",
+                DatumUpisa = s.DatumUpisa,
+                FakultetNaziv = s.Fakultet != null ? s.Fakultet.Naziv : null
+            })
+            .ToList();
+
+        model.Kolegiji = _db.Kolegiji
+            .AsNoTracking()
+            .Include(k => k.Fakultet)
+            .OrderBy(k => k.Naziv)
+            .Select(k => new OcjenaCreateViewModel.KolegijOption
+            {
+                Id = k.Id,
+                Naziv = k.Naziv,
+                ECTS = k.ECTS,
+                FakultetNaziv = k.Fakultet != null ? k.Fakultet.Naziv : null
+            })
+            .ToList();
+    }
+
+    private void PopulateEditOptions(OcjenaEditViewModel model)
+    {
+        model.Profesori = _db.Profesori
+            .AsNoTracking()
+            .Include(p => p.Fakultet)
+            .OrderBy(p => p.Prezime)
+            .ThenBy(p => p.Ime)
+            .Select(p => new OcjenaCreateViewModel.ProfesorOption
+            {
+                Id = p.Id,
+                Naziv = $"{p.Ime} {p.Prezime}",
+                Katedra = p.Katedra,
+                FakultetNaziv = p.Fakultet != null ? p.Fakultet.Naziv : null
+            })
+            .ToList();
+
+        model.Studenti = _db.Studenti
+            .AsNoTracking()
+            .Include(s => s.Fakultet)
+            .OrderBy(s => s.Prezime)
+            .ThenBy(s => s.Ime)
+            .Select(s => new OcjenaCreateViewModel.StudentOption
+            {
+                Id = s.Id,
+                Naziv = $"{s.Ime} {s.Prezime}",
+                DatumUpisa = s.DatumUpisa,
+                FakultetNaziv = s.Fakultet != null ? s.Fakultet.Naziv : null
+            })
+            .ToList();
+
+        model.Kolegiji = _db.Kolegiji
+            .AsNoTracking()
+            .Include(k => k.Fakultet)
+            .OrderBy(k => k.Naziv)
+            .Select(k => new OcjenaCreateViewModel.KolegijOption
+            {
+                Id = k.Id,
+                Naziv = k.Naziv,
+                ECTS = k.ECTS,
+                FakultetNaziv = k.Fakultet != null ? k.Fakultet.Naziv : null
+            })
+            .ToList();
+    }
+
+    private IQueryable<Ocjena> BuildOcjenaQuery(string? q)
+    {
+        var query = _db.Ocjene
+            .AsNoTracking()
+            .Include(o => o.Student)
+            .Include(o => o.Profesor)
+            .Include(o => o.Kolegij)
+            .AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(q))
+        {
+            var term = q.Trim();
+            query = query.Where(o =>
+                o.Student.Ime.Contains(term) ||
+                o.Student.Prezime.Contains(term) ||
+                o.Profesor.Ime.Contains(term) ||
+                o.Profesor.Prezime.Contains(term) ||
+                o.Kolegij.Naziv.Contains(term) ||
+                o.Komentar.Contains(term));
+        }
+
+        return query
+            .OrderByDescending(o => o.DatumOcjene)
+            .ThenBy(o => o.Student.Prezime)
+            .ThenBy(o => o.Student.Ime);
     }
 }

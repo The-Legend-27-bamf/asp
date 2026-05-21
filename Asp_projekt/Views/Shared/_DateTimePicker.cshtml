@@ -1,0 +1,15 @@
+@model Asp_projekt.Models.DateTimePickerModel
+
+@if (!string.IsNullOrWhiteSpace(Model.Label))
+{
+    <label class="info-label" for="@Model.InputId">@Model.Label</label>
+}
+
+<input id="@Model.InputId"
+       name="@Model.InputName"
+       type="text"
+       class="datetime-input"
+       placeholder="@Model.Placeholder"
+       value="@(Model.Value.HasValue ? Model.Value.Value.ToString("yyyy-MM-dd HH:mm") : string.Empty)"
+       data-datetime-picker
+       data-enable-time="@Model.EnableTime.ToString().ToLowerInvariant()" />

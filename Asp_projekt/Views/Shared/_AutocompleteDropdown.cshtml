@@ -1,0 +1,31 @@
+@model Asp_projekt.Models.AutocompleteDropdownModel
+
+<div id="@Model.ComponentId"
+     class="autocomplete"
+     data-autocomplete-root
+     data-endpoint="@Model.EndpointUrl"
+     data-min-chars="@Model.MinChars">
+    @if (!string.IsNullOrWhiteSpace(Model.Label))
+    {
+        <label class="info-label" for="@Model.InputId">@Model.Label</label>
+    }
+
+    <input id="@Model.InputId"
+           class="autocomplete-input"
+           type="text"
+           placeholder="@Model.Placeholder"
+           value="@Model.InitialText"
+           autocomplete="off"
+           data-autocomplete-input />
+
+    @if (!string.IsNullOrWhiteSpace(Model.HiddenInputName))
+    {
+        <input type="hidden"
+               id="@Model.HiddenInputId"
+               name="@Model.HiddenInputName"
+               value="@Model.HiddenInputValue"
+               data-autocomplete-hidden />
+    }
+
+    <div class="autocomplete-menu" data-autocomplete-menu hidden></div>
+</div>

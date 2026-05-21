@@ -45,6 +45,7 @@ public class OcjenaCreateViewModel
     public TipOcjene Tip { get; set; } = TipOcjene.UkupniDojam;
 
     [Required]
+    [StringLength(400)]
     public string Komentar { get; set; } = string.Empty;
 
     public DateTime DatumOcjene { get; set; } = DateTime.Today;

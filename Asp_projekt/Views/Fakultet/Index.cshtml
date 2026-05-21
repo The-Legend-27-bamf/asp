@@ -8,29 +8,22 @@
     <p class="page-subtitle">Pregled fakulteta i povezanih profesora, studenata i kolegija.</p>
 </section>
 
-@if (@Model == null || !@Model.Any())
-{
-    <p class="empty-note">Nema dostupnih fakulteta.</p>
-}
-else
-{
-    <section class="cards-grid">
-        @foreach (var fakultet in @Model)
-        {
-            <article class="entity-card">
-                <div class="card-top">
-                    <h2 class="card-title">@fakultet.Naziv</h2>
-                </div>
-                <div class="card-lines">
-                    <p class="card-meta">Ukupno povezanih: @(fakultet.Profesori.Count + fakultet.Studenti.Count + fakultet.Kolegiji.Count)</p>
-                </div>
-                <div class="chip-wrap">
-                    <span class="chip chip--accent">Prof: @fakultet.Profesori.Count</span>
-                    <span class="chip chip--ok">Stud: @fakultet.Studenti.Count</span>
-                    <span class="chip chip--accent">Kol: @fakultet.Kolegiji.Count</span>
-                </div>
-                <a class="link-btn" asp-action="Details" asp-route-id="@fakultet.Id">Details</a>
-            </article>
-        }
-    </section>
-}
+<section class="page-actions">
+    <a class="link-btn" asp-action="Create">Dodaj fakultet</a>
+</section>
+
+<section class="list-toolbar"
+         data-ajax-list-root
+         data-search-url="@Url.Action("Search", "Fakultet")"
+         data-target-id="fakultetListTarget">
+    <label class="info-label" for="fakultetSearch">Brza pretraga</label>
+    <input id="fakultetSearch"
+           type="search"
+           class="search-input"
+           placeholder="Pretrazi po nazivu fakulteta..."
+           data-ajax-search-input />
+</section>
+
+<div id="fakultetListTarget">
+    <partial name="_FakultetCards" model="Model" />
+</div>

@@ -1,0 +1,106 @@
+@model Asp_projekt.Models.ProfesorEditViewModel
+@using Asp_projekt.Models
+@{
+    ViewData["Title"] = "Uredi profesora";
+}
+
+<section class="detail-hero">
+    <span class="hero-badge">Profesor</span>
+    <div class="hero-main">
+        <h1 class="hero-title">Uredi profesora</h1>
+        <p class="hero-subtitle">Azuriraj podatke o profesoru.</p>
+    </div>
+</section>
+
+<section class="detail-grid">
+    <article class="detail-card core-card">
+        <header class="card-header">
+            <h2>Podaci</h2>
+            <span class="card-tag">Edit</span>
+        </header>
+
+        <form asp-action="Edit" asp-route-id="@Model.Id" method="post">
+            @Html.AntiForgeryToken()
+            <input asp-for="Id" type="hidden" />
+            <div asp-validation-summary="ModelOnly"></div>
+
+            <div class="info-grid">
+                <div class="info-item">
+                    <label class="info-label" asp-for="Ime">Ime</label>
+                    <input asp-for="Ime" />
+                    <span asp-validation-for="Ime"></span>
+                </div>
+
+                <div class="info-item">
+                    <label class="info-label" asp-for="Prezime">Prezime</label>
+                    <input asp-for="Prezime" />
+                    <span asp-validation-for="Prezime"></span>
+                </div>
+
+                <div class="info-item">
+                    <label class="info-label" asp-for="Katedra">Katedra</label>
+                    <input asp-for="Katedra" />
+                    <span asp-validation-for="Katedra"></span>
+                </div>
+
+                <div class="info-item">
+                    <label class="info-label" asp-for="FakultetId">Fakultet</label>
+                    <select asp-for="FakultetId">
+                        <option value="">Bez fakulteta</option>
+                        @foreach (var fakultet in Model.Fakulteti)
+                        {
+                            if (Model.FakultetId == fakultet.Id)
+                            {
+                                <option value="@fakultet.Id" selected>@fakultet.Naziv</option>
+                            }
+                            else
+                            {
+                                <option value="@fakultet.Id">@fakultet.Naziv</option>
+                            }
+                        }
+                    </select>
+                    <span asp-validation-for="FakultetId"></span>
+
+                    @{
+                        var fakultetQuickPickModel = new AutocompleteDropdownModel
+                        {
+                            ComponentId = "fakultetQuickPickProfesorEdit",
+                            InputId = "fakultetQuickPickInputProfesorEdit",
+                            EndpointUrl = Url.Action("Autocomplete", "Fakultet") ?? string.Empty,
+                            Label = "Brzi odabir fakulteta",
+                            Placeholder = "Upisi barem 2 znaka",
+                            MinChars = 2
+                        };
+                    }
+                    <partial name="_AutocompleteDropdown" model="fakultetQuickPickModel" />
+                </div>
+            </div>
+
+            <div class="inline-links inline-links--spaced">
+                <button class="link-btn" type="submit">Spremi promjene</button>
+                <a class="link-btn link-btn--ghost" asp-action="Details" asp-route-id="@Model.Id">Odustani</a>
+            </div>
+        </form>
+    </article>
+</section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        (function () {
+            const fakultetSelect = document.getElementById('FakultetId');
+            const fakultetQuickPick = document.getElementById('fakultetQuickPickProfesorEdit');
+
+            fakultetQuickPick?.addEventListener('autocomplete:selected', function (event) {
+                const selectedId = event?.detail?.value;
+                if (!fakultetSelect || selectedId == null || selectedId === '') {
+                    return;
+                }
+
+                fakultetSelect.value = String(selectedId);
+                fakultetSelect.dispatchEvent(new Event('change'));
+            });
+        })();
+    </script>
+}

@@ -1,14 +1,14 @@
-@model Asp_projekt.Models.OcjenaCreateViewModel
+@model Asp_projekt.Models.OcjenaEditViewModel
 @using Asp_projekt.Models
 @{
-    ViewData["Title"] = "Daj ocjenu";
+    ViewData["Title"] = "Uredi ocjenu";
 }
 
 <section class="detail-hero">
     <span class="hero-badge">Ocjena</span>
     <div class="hero-main">
-        <h1 class="hero-title">Daj ocjenu</h1>
-        <p class="hero-subtitle">Unesi novu ocjenu za odabranog profesora, studenta i kolegij.</p>
+        <h1 class="hero-title">Uredi ocjenu</h1>
+        <p class="hero-subtitle">Azuriraj postojece podatke o ocjeni.</p>
     </div>
 </section>
 
@@ -16,11 +16,12 @@
     <article class="detail-card core-card">
         <header class="card-header">
             <h2>Podaci</h2>
-            <span class="card-tag">Create</span>
+            <span class="card-tag">Edit</span>
         </header>
 
-        <form asp-action="Create" method="post">
+        <form asp-action="Edit" asp-route-id="@Model.Id" method="post">
             @Html.AntiForgeryToken()
+            <input asp-for="Id" type="hidden" />
             <div asp-validation-summary="ModelOnly"></div>
 
             <div class="info-grid">
@@ -50,8 +51,8 @@
                     @{
                         var profesorQuickPickModel = new AutocompleteDropdownModel
                         {
-                            ComponentId = "profesorQuickPick",
-                            InputId = "profesorQuickPickInput",
+                            ComponentId = "profesorQuickPickEdit",
+                            InputId = "profesorQuickPickInputEdit",
                             EndpointUrl = Url.Action("Autocomplete", "Profesor") ?? string.Empty,
                             Label = "Brzi odabir profesora",
                             Placeholder = "Upisi barem 2 znaka",
@@ -84,11 +85,12 @@
                         }
                     </select>
                     <span asp-validation-for="StudentId"></span>
+
                     @{
                         var studentQuickPickModel = new AutocompleteDropdownModel
                         {
-                            ComponentId = "studentQuickPick",
-                            InputId = "studentQuickPickInput",
+                            ComponentId = "studentQuickPickEdit",
+                            InputId = "studentQuickPickInputEdit",
                             EndpointUrl = Url.Action("Autocomplete", "Student") ?? string.Empty,
                             Label = "Brzi odabir studenta",
                             Placeholder = "Upisi barem 2 znaka",
@@ -124,8 +126,8 @@
                     @{
                         var kolegijQuickPickModel = new AutocompleteDropdownModel
                         {
-                            ComponentId = "kolegijQuickPick",
-                            InputId = "kolegijQuickPickInput",
+                            ComponentId = "kolegijQuickPickEdit",
+                            InputId = "kolegijQuickPickInputEdit",
                             EndpointUrl = Url.Action("Autocomplete", "Kolegij") ?? string.Empty,
                             Label = "Brzi odabir kolegija",
                             Placeholder = "Upisi barem 2 znaka",
@@ -142,7 +144,7 @@
                 </div>
 
                 <div class="info-item">
-                    <label class="info-label" asp-for="Vrijednost">Vrijednost (1–5)</label>
+                    <label class="info-label" asp-for="Vrijednost">Vrijednost (1-5)</label>
                     <input asp-for="Vrijednost" type="number" min="1" max="5" />
                     <span asp-validation-for="Vrijednost"></span>
                 </div>
@@ -171,8 +173,8 @@
             </div>
 
             <div class="inline-links inline-links--spaced">
-                <button class="link-btn" type="submit">Spremi</button>
-                <a class="link-btn link-btn--ghost" asp-action="Index">Odustani</a>
+                <button class="link-btn" type="submit">Spremi promjene</button>
+                <a class="link-btn link-btn--ghost" asp-action="Details" asp-route-id="@Model.Id">Odustani</a>
             </div>
         </form>
     </article>
@@ -183,43 +185,28 @@
             <span class="card-tag">Info</span>
         </header>
         <div class="card-copy">
-            <p>Trenutni odabir iz padajućih izbornika:</p>
+            <p>Trenutni odabir iz padajucih izbornika:</p>
             <div class="info-grid" id="napomenaSummary" aria-live="polite">
                 <div class="info-item">
                     <div class="info-label">Profesor</div>
-                    <div><strong id="napProfesorNaziv">—</strong></div>
+                    <div><strong id="napProfesorNaziv">-</strong></div>
                     <div id="napProfesorMeta"></div>
                 </div>
                 <div class="info-item">
                     <div class="info-label">Student</div>
-                    <div><strong id="napStudentNaziv">—</strong></div>
+                    <div><strong id="napStudentNaziv">-</strong></div>
                     <div id="napStudentMeta"></div>
                 </div>
                 <div class="info-item">
                     <div class="info-label">Kolegij</div>
-                    <div><strong id="napKolegijNaziv">—</strong></div>
+                    <div><strong id="napKolegijNaziv">-</strong></div>
                     <div id="napKolegijMeta"></div>
                 </div>
                 <div class="info-item">
                     <div class="info-label">Tip ocjene</div>
-                    <div><strong id="napTip">—</strong></div>
+                    <div><strong id="napTip">-</strong></div>
                 </div>
             </div>
-            <p>Odabrani profesor, student i kolegij moraju postojati u bazi.</p>
-            <p>Nakon spremanja, ocjena će se prikazati na listi ocjena.</p>
-        </div>
-    </article>
-
-    <article class="detail-card">
-        <header class="card-header">
-            <h2>Smjernice</h2>
-            <span class="card-tag">Hint</span>
-        </header>
-        <div class="card-copy">
-            <p><strong>Vrijednost</strong> se unosi u rasponu <strong>1–5</strong>.</p>
-            <p><strong>Tip ocjene</strong> odaberi prema kontekstu (npr. ispit, projekt, laboratorij).</p>
-            <p><strong>Komentar</strong> je opcionalan, ali pomaže pri kasnijem pregledu.</p>
-            <p><strong>Datum</strong> koristi datum kada je ocjena dodijeljena.</p>
         </div>
     </article>
 </section>
@@ -233,9 +220,9 @@
             const studentSelect = document.getElementById('StudentId');
             const kolegijSelect = document.getElementById('KolegijId');
             const tipSelect = document.getElementById('Tip');
-            const profesorQuickPick = document.getElementById('profesorQuickPick');
-            const studentQuickPick = document.getElementById('studentQuickPick');
-            const kolegijQuickPick = document.getElementById('kolegijQuickPick');
+            const profesorQuickPick = document.getElementById('profesorQuickPickEdit');
+            const studentQuickPick = document.getElementById('studentQuickPickEdit');
+            const kolegijQuickPick = document.getElementById('kolegijQuickPickEdit');
 
             const napProfesorNaziv = document.getElementById('napProfesorNaziv');
             const napProfesorMeta = document.getElementById('napProfesorMeta');
@@ -262,7 +249,7 @@
                 const tipOpt = selectedOption(tipSelect);
 
                 if (napProfesorNaziv) {
-                    napProfesorNaziv.textContent = professorOpt?.dataset?.naziv || professorOpt?.text || '—';
+                    napProfesorNaziv.textContent = professorOpt?.dataset?.naziv || professorOpt?.text || '-';
                 }
                 if (napProfesorMeta) {
                     const meta = formatMeta([
@@ -273,7 +260,7 @@
                 }
 
                 if (napStudentNaziv) {
-                    napStudentNaziv.textContent = studentOpt?.dataset?.naziv || studentOpt?.text || '—';
+                    napStudentNaziv.textContent = studentOpt?.dataset?.naziv || studentOpt?.text || '-';
                 }
                 if (napStudentMeta) {
                     const meta = formatMeta([
@@ -284,7 +271,7 @@
                 }
 
                 if (napKolegijNaziv) {
-                    napKolegijNaziv.textContent = kolegijOpt?.dataset?.naziv || kolegijOpt?.text || '—';
+                    napKolegijNaziv.textContent = kolegijOpt?.dataset?.naziv || kolegijOpt?.text || '-';
                 }
                 if (napKolegijMeta) {
                     const ects = kolegijOpt?.dataset?.ects ? `ECTS: ${kolegijOpt.dataset.ects}` : '';
@@ -296,7 +283,7 @@
                 }
 
                 if (napTip) {
-                    napTip.textContent = tipOpt?.text || '—';
+                    napTip.textContent = tipOpt?.text || '-';
                 }
             }
 

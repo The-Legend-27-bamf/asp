@@ -1,0 +1,33 @@
+@model IEnumerable<Student>
+
+@if (@Model == null || !@Model.Any())
+{
+    <p class="empty-note">Nema dostupnih studenata za odabrani filter.</p>
+}
+else
+{
+    <section class="cards-grid" data-ajax-animated-list>
+        @foreach (var student in @Model)
+        {
+            <article class="entity-card">
+                <div class="card-top">
+                    <h2 class="card-title">@student.Ime @student.Prezime</h2>
+                </div>
+                <div class="chip-wrap">
+                    <span class="chip chip--accent">Upis @student.DatumUpisa.ToString("dd.MM.yyyy")</span>
+                    <span class="chip chip--ok">Ocjene @student.DaneOcjene.Count</span>
+                </div>
+                <div class="inline-links">
+                    <a class="link-btn" asp-action="Details" asp-route-id="@student.Id">Details</a>
+                    <a class="link-btn link-btn--ghost" asp-action="Edit" asp-route-id="@student.Id">Uredi</a>
+                    <form asp-action="Delete" asp-route-id="@student.Id" method="post">
+                        @Html.AntiForgeryToken()
+                        <button class="link-btn link-btn--ghost" type="submit" onclick="return confirm('Obrisati ovog studenta?');">
+                            Obrisi
+                        </button>
+                    </form>
+                </div>
+            </article>
+        }
+    </section>
+}

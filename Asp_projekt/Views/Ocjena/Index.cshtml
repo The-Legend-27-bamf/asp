@@ -12,51 +12,18 @@
     <a class="link-btn" asp-action="Create">Daj ocjenu</a>
 </section>
 
-@if (@Model == null || !@Model.Any())
-{
-    <p class="empty-note">Nema dostupnih ocjena.</p>
-}
-else
-{
-    <section class="cards-grid">
-        @foreach (var ocjena in @Model)
-        {
-            <article class="entity-card">
-                <div class="card-top">
-                    <h2 class="card-title">Ocjena (@ocjena.Tip)</h2>
-                </div>
+<section class="list-toolbar"
+         data-ajax-list-root
+         data-search-url="@Url.Action("Search", "Ocjena")"
+         data-target-id="ocjenaListTarget">
+    <label class="info-label" for="ocjenaSearch">Brza pretraga</label>
+    <input id="ocjenaSearch"
+           type="search"
+           class="search-input"
+           placeholder="Pretrazi po studentu, kolegiju ili komentaru..."
+           data-ajax-search-input />
+</section>
 
-                <div class="grade-pill-center">
-                    @{ var filledStars = Math.Clamp(ocjena.Vrijednost, 0, 5); }
-                    <span class="chip chip--sun chip--stars" aria-label="Ocjena: @ocjena.Vrijednost od 5">
-                        <span class="stars" aria-hidden="true">
-                            @for (var i = 1; i <= 5; i++)
-                            {
-                                <svg class="star @(i <= filledStars ? "is-filled" : "is-empty")" viewBox="0 0 24 24" focusable="false" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M12 2.7l2.9 6.1 6.7.9-4.9 4.7 1.2 6.7L12 17.9 6.1 21.1l1.2-6.7-4.9-4.7 6.7-.9L12 2.7Z" />
-                                </svg>
-                            }
-                        </span>
-                    </span>
-                </div>
-                <div class="card-lines">
-                    <p class="card-meta">Student: @ocjena.Student.Ime @ocjena.Student.Prezime</p>
-                    <p class="card-meta">Kolegij: @ocjena.Kolegij.Naziv</p>
-                </div>
-                <div class="chip-wrap">
-                    <span class="chip chip--accent">Tip @ocjena.Tip</span>
-                    <span class="chip chip--ok">@ocjena.DatumOcjene.ToString("dd.MM.yyyy")</span>
-                </div>
-
-                <div class="inline-links">
-                    <a class="link-btn" asp-action="Details" asp-route-id="@ocjena.Id">Details</a>
-                    <form asp-action="Delete" asp-route-id="@ocjena.Id" method="post">
-                        <button class="link-btn link-btn--ghost" type="submit" onclick="return confirm('Obrisati ovu ocjenu?');">
-                            Obriši
-                        </button>
-                    </form>
-                </div>
-            </article>
-        }
-    </section>
-}
+<div id="ocjenaListTarget">
+    <partial name="_OcjenaCards" model="Model" />
+</div>

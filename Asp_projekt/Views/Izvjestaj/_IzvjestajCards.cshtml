@@ -1,0 +1,30 @@
+@model IEnumerable<Izvjestaj>
+
+@if (@Model == null || !@Model.Any())
+{
+    <p class="empty-note">Nema dostupnih izvjestaja za odabrani filter.</p>
+}
+else
+{
+    <section class="cards-grid" data-ajax-animated-list>
+        @foreach (var izvjestaj in @Model)
+        {
+            <article class="entity-card">
+                <div class="card-top">
+                    <h2 class="card-title">Izvjestaj @izvjestaj.DatumGeneriranja.ToString("dd.MM.yyyy")</h2>
+                    <span class="chip chip--ok">@izvjestaj.ProsjecnaOcjena.ToString("0.00")</span>
+                </div>
+                <div class="card-lines">
+                    <p class="card-meta">Profesor: @izvjestaj.Profesor.Ime @izvjestaj.Profesor.Prezime</p>
+                </div>
+                <div class="chip-wrap">
+                    <span class="chip chip--accent">Broj ocjena @izvjestaj.BrojOcjena</span>
+                    <span class="chip chip--ok">@izvjestaj.DatumGeneriranja.ToString("dd.MM.yyyy")</span>
+                </div>
+                <div class="inline-links">
+                    <a class="link-btn" asp-action="Details" asp-route-id="@izvjestaj.Id">Details</a>
+                </div>
+            </article>
+        }
+    </section>
+}

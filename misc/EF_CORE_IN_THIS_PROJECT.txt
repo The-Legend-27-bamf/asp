@@ -1,0 +1,289 @@
+EF Core principles used in this project (with examples)
+======================================================
+
+Project context
+---------------
+This is an ASP.NET Core MVC app that uses Entity Framework Core (EF Core) with SQL Server.
+EF Core is the ORM (Object-Relational Mapper) that maps C# classes (entities) to database tables
+and lets you query/update the database using LINQ.
+
+Key files to look at:
+- Asp_projekt/Data/AppDbContext.cs
+- Asp_projekt/Program.cs
+- Asp_projekt/Data/Migrations/*
+- Controllers: Asp_projekt/Controllers/*.cs
+- Entities: Asp_projekt/Models/*.cs
+- Seed: Asp_projekt/Models/MainClass.cs
+
+
+1) DbContext + DbSet: the unit-of-work + repository gateway
+-----------------------------------------------------------
+EF Core revolves around a DbContext.
+In this project the DbContext is:
+
+- Asp_projekt/Data/AppDbContext.cs
+
+It inherits from DbContext and exposes DbSet<T> properties:
+
+- DbSet<Fakultet> Fakulteti
+- DbSet<Profesor> Profesori
+- DbSet<Student> Studenti
+- DbSet<Kolegij> Kolegiji
+- DbSet<Ocjena> Ocjene
+- DbSet<Izvjestaj> Izvjestaji
+
+Principle:
+- DbContext represents a session with the database.
+- DbSet<T> represents a table-like collection of entities you can query and modify.
+
+Example usage (queries):
+- Asp_projekt/Controllers/KolegijController.cs
+  _db.Kolegiji.AsNoTracking().Include(k => k.Profesori).Include(k => k.Studenti).ToList();
+
+Example usage (writes):
+- Asp_projekt/Controllers/OcjenaController.cs
+  _db.Ocjene.Add(ocjena);
+  _db.SaveChanges();
+
+
+2) Dependency Injection (DI): DbContext lifecycle managed by ASP.NET
+-------------------------------------------------------------------
+In ASP.NET Core, DbContext is typically registered in DI and injected into controllers.
+
+- Asp_projekt/Program.cs
+  builder.Services.AddDbContext<AppDbContext>(options =>
+      options.UseSqlServer(connectionString));
+
+Controllers receive it in the constructor:
+- e.g. Asp_projekt/Controllers/OcjenaController.cs
+  public OcjenaController(AppDbContext db) { _db = db; }
+
+Principle:
+- AddDbContext registers AppDbContext as a scoped service (one context per web request by default).
+- Controllers don’t manually create DbContext; they depend on DI.
+
+Why it matters:
+- Correct scoping avoids threading bugs.
+- It centralizes configuration (provider, connection string, logging, etc.).
+
+
+3) Provider configuration + connection string
+--------------------------------------------
+The provider is SQL Server:
+
+- Asp_projekt/Program.cs
+  options.UseSqlServer(connectionString)
+
+Principle:
+- EF Core is provider-based (SQL Server, SQLite, PostgreSQL, etc.).
+- The provider decides how LINQ translates to SQL.
+
+
+4) Migrations: schema tracked as code
+-------------------------------------
+EF Core migrations capture the database schema evolution.
+Your initial schema is defined in:
+
+- Asp_projekt/Data/Migrations/20260507115052_InitialCreate.cs
+
+You can see tables, columns, constraints, and indexes being created.
+Examples:
+- Table "Ocjene" has FKs to Profesor, Student, Kolegij.
+- Join table "KolegijProfesor" is created for a many-to-many relationship.
+
+Principle:
+- Your entity model is the source of truth.
+- Migrations are the reproducible history of schema changes.
+
+Applying migrations at startup:
+- Asp_projekt/Program.cs
+  db.Database.Migrate();
+
+This runs any pending migrations against the configured database.
+
+
+5) Relationships: FKs + navigation properties
+---------------------------------------------
+This project relies mostly on EF Core conventions plus some DataAnnotations.
+
+5.1 One-to-many / many-to-one via FK properties
+Example: Ocjena -> Profesor/Student/Kolegij
+
+- Asp_projekt/Models/Ocjena.cs
+  public int ProfesorId { get; set; }
+  public virtual Profesor Profesor { get; set; }
+
+  public int StudentId { get; set; }
+  public virtual Student Student { get; set; }
+
+  public int KolegijId { get; set; }
+  public virtual Kolegij Kolegij { get; set; }
+
+The migration shows the FK constraints and cascade delete:
+- Asp_projekt/Data/Migrations/20260507115052_InitialCreate.cs
+  FK_Ocjene_Profesori_ProfesorId (Cascade)
+  FK_Ocjene_Studenti_StudentId (Cascade)
+  FK_Ocjene_Kolegiji_KolegijId (Cascade)
+
+Principle:
+- FK properties store the relationship ids.
+- Navigation properties let you traverse object graphs.
+
+5.2 Optional relationships
+Example: Profesor -> Fakultet is optional:
+- Asp_projekt/Models/Profesor.cs
+  public int? FakultetId { get; set; }
+  public virtual Fakultet? Fakultet { get; set; }
+
+Because FakultetId is nullable, EF models it as optional.
+
+5.3 Many-to-many (skip navigations)
+Example: Kolegij <-> Profesor
+- Asp_projekt/Models/Kolegij.cs has ICollection<Profesor> Profesori
+- Asp_projekt/Models/Profesor.cs has ICollection<Kolegij> Kolegiji
+
+The migration creates a join table:
+- "KolegijProfesor" (KolegijiId, ProfesoriId)
+
+Principle:
+- EF Core can manage many-to-many without defining an explicit join entity class.
+
+Important note about Kolegij <-> Student:
+In your current schema, students have a nullable KolegijId FK:
+- Asp_projekt/Models/Student.cs
+  public int? KolegijId { get; set; }
+  public virtual Kolegij? Kolegij { get; set; }
+
+So Student->Kolegij is a many-to-one (many students can belong to one course), not many-to-many.
+Kolegij still has ICollection<Student> Studenti, which is the inverse navigation.
+
+
+6) Loading related data: eager loading with Include/ThenInclude
+--------------------------------------------------------------
+EF Core does NOT automatically load all navigations by default.
+This project uses eager loading explicitly.
+
+Examples:
+- Asp_projekt/Controllers/OcjenaController.cs (Details)
+  _db.Ocjene.AsNoTracking()
+      .Include(o => o.Profesor)
+      .Include(o => o.Student)
+      .Include(o => o.Kolegij)
+
+- Asp_projekt/Controllers/StudentController.cs (Details)
+  _db.Studenti.AsNoTracking()
+      .Include(s => s.DaneOcjene).ThenInclude(o => o.Kolegij)
+      .Include(s => s.DaneOcjene).ThenInclude(o => o.Profesor)
+
+Principle:
+- Include loads a navigation property.
+- ThenInclude continues down the graph.
+
+Why it matters:
+- Prevents N+1 query problems.
+- Makes view rendering predictable (views can safely access related data).
+
+
+7) Tracking vs no-tracking queries
+----------------------------------
+A big EF Core concept is change tracking.
+
+This project intentionally uses AsNoTracking() for read-only pages:
+- Index and Details actions across controllers often call AsNoTracking().
+
+Example:
+- Asp_projekt/Controllers/FakultetController.cs
+  _db.Fakulteti.AsNoTracking().Include(...).ToList();
+
+Principle:
+- Tracked entities are monitored by the DbContext for changes.
+- AsNoTracking() skips tracking => less memory, faster reads.
+
+When tracking is useful:
+- When you intend to update entities in the same context.
+
+In this project, writes are typically done by creating/removing entities and calling SaveChanges(),
+so tracking is used implicitly in those cases.
+
+
+8) Creating and saving: SaveChanges and identity keys
+-----------------------------------------------------
+Example: creating an Ocjena from form input
+- Asp_projekt/Controllers/OcjenaController.cs (POST Create)
+
+Flow:
+1) Validate input (ModelState)
+2) Load referenced entities (Profesor, Student, Kolegij)
+3) Create new Ocjena entity referencing them
+4) _db.Ocjene.Add(ocjena)
+5) _db.SaveChanges()
+
+Principle:
+- SaveChanges() executes SQL INSERT/UPDATE/DELETE statements in a transaction.
+- Identity keys (Id) are generated by SQL Server and populated back into entities.
+
+
+9) Seeding an object graph (and why ordering matters)
+----------------------------------------------------
+Seeding is done manually in:
+- Asp_projekt/Models/MainClass.cs
+
+The seeder builds a connected object graph:
+- Fakultet
+  - Profesori
+  - Studenti
+  - Kolegiji
+- Kolegij <-> Profesor links
+- Student -> Kolegij assignment
+- Ocjene reference Profesor + Student + Kolegij
+
+You’ll see an explicit note and ordering:
+- "Save principal entities first, so identity IDs are generated."
+  db.Fakulteti.AddRange(fakulteti);
+  db.SaveChanges();
+
+Principles demonstrated:
+- EF can insert a graph of connected entities.
+- Sometimes you save “principals” first so dependent entities can reference generated keys.
+- Seeding is guarded so it doesn’t reinsert if data already exists.
+
+Startup logic that applies migrations and seeds:
+- Asp_projekt/Program.cs
+  if (resetOnStartup) db.Database.EnsureDeleted();
+  db.Database.Migrate();
+  MainClass.SeedDatabase(db, sets: seedSets);
+
+
+10) Query projection: selecting into view models
+------------------------------------------------
+In the Ocjena Create form, the controller projects entities into a dedicated view model.
+
+- Asp_projekt/Controllers/OcjenaController.cs (GET Create)
+  .Select(p => new OcjenaCreateViewModel.ProfesorOption { ... })
+
+Principle:
+- Projection reduces data loaded and avoids passing full entities to the view.
+- It keeps the UI model separate from the persistence model.
+
+
+11) Working with cycles in JSON serialization
+---------------------------------------------
+Entity graphs can contain cycles (e.g., Profesor -> Kolegiji -> Profesori ...).
+The project configures JSON options:
+
+- Asp_projekt/Program.cs
+  options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+
+Principle:
+- Prevents serialization errors when returning EF entity graphs as JSON.
+- Even though this is an MVC app, it’s a common EF-related configuration when APIs exist.
+
+
+Practical “rules of thumb” based on this codebase
+-------------------------------------------------
+1) Use AsNoTracking() for read-only screens (Index/Details).
+2) Use Include/ThenInclude when the view needs related data.
+3) Keep writes simple: create entity + Add + SaveChanges, or Remove + SaveChanges.
+4) Prefer projecting to a view model for form screens instead of passing entities.
+5) Seed data in a controlled way; apply migrations first, seed only if empty.
+

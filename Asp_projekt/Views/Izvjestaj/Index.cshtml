@@ -8,29 +8,22 @@
     <p class="page-subtitle">Automatski generirani izvjestaji po profesorima.</p>
 </section>
 
-@if (@Model == null || !@Model.Any())
-{
-    <p class="empty-note">Nema dostupnih izvjestaja.</p>
-}
-else
-{
-    <section class="cards-grid">
-        @foreach (var izvjestaj in @Model)
-        {
-            <article class="entity-card">
-                <div class="card-top">
-                    <h2 class="card-title">Izvjestaj @izvjestaj.DatumGeneriranja.ToString("dd.MM.yyyy")</h2>
-                    <span class="chip chip--ok">@izvjestaj.ProsjecnaOcjena.ToString("0.00")</span>
-                </div>
-                <div class="card-lines">
-                    <p class="card-meta">Profesor: @izvjestaj.Profesor.Ime @izvjestaj.Profesor.Prezime</p>
-                </div>
-                <div class="chip-wrap">
-                    <span class="chip chip--accent">Broj ocjena @izvjestaj.BrojOcjena</span>
-                    <span class="chip chip--ok">@izvjestaj.DatumGeneriranja.ToString("dd.MM.yyyy")</span>
-                </div>
-                <a class="link-btn" asp-action="Details" asp-route-id="@izvjestaj.Id">Details</a>
-            </article>
-        }
-    </section>
-}
+<section class="list-toolbar">
+    <p class="empty-note">Izvjestaji su read-only: generiraju se iz postojecih podataka i ne unose se rucno.</p>
+</section>
+
+<section class="list-toolbar"
+         data-ajax-list-root
+         data-search-url="@Url.Action("Search", "Izvjestaj")"
+         data-target-id="izvjestajListTarget">
+    <label class="info-label" for="izvjestajSearch">Brza pretraga</label>
+    <input id="izvjestajSearch"
+           type="search"
+           class="search-input"
+           placeholder="Pretrazi po profesoru ili katedri..."
+           data-ajax-search-input />
+</section>
+
+<div id="izvjestajListTarget">
+    <partial name="_IzvjestajCards" model="Model" />
+</div>

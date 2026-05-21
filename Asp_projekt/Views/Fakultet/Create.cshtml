@@ -1,0 +1,54 @@
+@model Asp_projekt.Models.FakultetCreateViewModel
+@{
+    ViewData["Title"] = "Novi fakultet";
+}
+
+<section class="detail-hero">
+    <span class="hero-badge">Fakultet</span>
+    <div class="hero-main">
+        <h1 class="hero-title">Novi fakultet</h1>
+        <p class="hero-subtitle">Unesi naziv novog fakulteta.</p>
+    </div>
+</section>
+
+<section class="detail-grid">
+    <article class="detail-card core-card">
+        <header class="card-header">
+            <h2>Podaci</h2>
+            <span class="card-tag">Create</span>
+        </header>
+
+        <form asp-action="Create" method="post">
+            @Html.AntiForgeryToken()
+            <div asp-validation-summary="ModelOnly"></div>
+
+            <div class="info-grid">
+                <div class="info-item">
+                    <label class="info-label" asp-for="Naziv">Naziv fakulteta</label>
+                    <input asp-for="Naziv" />
+                    <span asp-validation-for="Naziv"></span>
+                </div>
+            </div>
+
+            <div class="inline-links inline-links--spaced">
+                <button class="link-btn" type="submit">Spremi</button>
+                <a class="link-btn link-btn--ghost" asp-action="Index">Odustani</a>
+            </div>
+        </form>
+    </article>
+
+    <article class="detail-card">
+        <header class="card-header">
+            <h2>Napomena</h2>
+            <span class="card-tag">Info</span>
+        </header>
+        <div class="card-copy">
+            <p>Uneseni naziv treba biti jasan i jedinstven unutar evidencije.</p>
+            <p>Nakon spremanja, fakultet ce biti vidljiv na listi fakulteta.</p>
+        </div>
+    </article>
+</section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -1,0 +1,202 @@
+Routing principles used in this project (attribute routing focus)
+===============================================================
+
+Project context
+---------------
+This is an ASP.NET Core MVC app. Requests are mapped to controller actions using *endpoint routing*.
+Your project uses *pure attribute routing* — every route is declared explicitly via attributes on
+controllers and actions. Conventional routing has been removed.
+
+Key files to look at:
+- Asp_projekt/Program.cs
+- Asp_projekt/Controllers/*.cs
+- Views using tag helpers (asp-controller/asp-action/asp-route-*)
+
+
+1) Endpoint routing setup in Program.cs
+--------------------------------------
+In ASP.NET Core, routing is enabled with:
+- app.UseRouting();
+
+Then endpoints are mapped:
+- app.MapControllers();   // the only endpoint mapping call — activates all attribute-routed controllers
+
+See:
+- Asp_projekt/Program.cs
+
+Important idea:
+- MapControllers() is all that is needed when every controller uses attribute routing.
+- There is no MapControllerRoute() call in this project.
+
+
+2) Attribute routing: what it is and how you use it here
+--------------------------------------------------------
+Attribute routing means the URL template is declared on the controller/action using attributes.
+
+In this repo, almost every controller starts with:
+
+- [Route("[controller]")]
+
+Example:
+- Asp_projekt/Controllers/OcjenaController.cs
+  [Route("[controller]")]
+  public class OcjenaController : Controller
+
+Principle:
+- "[controller]" is a route token that gets replaced by the controller name without the "Controller" suffix.
+  So "OcjenaController" becomes base path "/Ocjena".
+
+
+2.1) Controller prefix + action templates
+-----------------------------------------
+Once a controller has [Route("[controller]")], action attributes define the remaining path.
+
+Common pattern in this project:
+- [HttpGet("")] for the index/list endpoint
+- [HttpGet("{id:int}")] for details endpoint (with an int constraint)
+
+Examples:
+- Asp_projekt/Controllers/IzvjestajController.cs
+  [Route("[controller]")]
+  public class IzvjestajController
+  {
+      [HttpGet("")]
+      public IActionResult Index()   // GET /Izvjestaj
+
+      [HttpGet("{id:int}")]
+      public IActionResult Details(int id)  // GET /Izvjestaj/123
+  }
+
+- Asp_projekt/Controllers/StudentController.cs
+  [HttpGet("")]              => GET /Student
+  [HttpGet("{id:int}")]      => GET /Student/123
+
+
+2.2) Route constraints (e.g. {id:int})
+--------------------------------------
+You use parameter constraints directly in the route template:
+
+- [HttpGet("{id:int}")]
+
+Principle:
+- This ensures the route only matches if the segment is an integer.
+- It prevents ambiguous matches and gives cleaner 404s when the URL is wrong.
+
+Example:
+- Asp_projekt/Controllers/OcjenaController.cs
+  [HttpGet("{id:int}")]
+  public IActionResult Details(int id)
+
+
+2.3) HTTP verb constraints: same path, different action
+------------------------------------------------------
+You have GET and POST actions sharing the same *route template* but different HTTP methods.
+
+Example:
+- Asp_projekt/Controllers/OcjenaController.cs
+  [HttpGet("Create")]
+  public IActionResult Create()             // GET /Ocjena/Create
+
+  [HttpPost("Create")]
+  public IActionResult Create(model ...)    // POST /Ocjena/Create
+
+Principle:
+- [HttpGet] / [HttpPost] are both verb constraints and routing attributes.
+- The combination of route template + HTTP method selects the action.
+
+
+2.4) Absolute routes override controller prefix
+-----------------------------------------------
+If you start the template with "/", it becomes an absolute route (ignores the controller prefix).
+
+Example:
+- Asp_projekt/Controllers/HomeController.cs
+  [Route("[controller]")]
+  public class HomeController
+  {
+      [HttpGet("")]
+      [HttpGet("/")]
+      public IActionResult Index()
+  }
+
+This creates two routes to the same action:
+- GET /Home
+- GET /
+
+Principle:
+- Absolute templates ("/") are useful for a “site root” landing page.
+
+
+2.5) Action segments like "Privacy" and "Error"
+------------------------------------------------
+Example:
+- Asp_projekt/Controllers/HomeController.cs
+  [HttpGet("Privacy")] => GET /Home/Privacy
+  [HttpGet("Error")]   => GET /Home/Error
+
+Principle:
+- When you write a literal segment, it becomes part of the final URL.
+
+
+3) Why conventional routing was removed
+---------------------------------------
+The project originally also registered a conventional MVC fallback route:
+
+  app.MapControllerRoute(
+      name: "default",
+      pattern: "{controller=Home}/{action=Index}/{id?}");
+
+This was removed because every controller already declares explicit attribute routes.
+The conventional route provided no additional coverage and its presence was misleading -- it implied
+that some actions could be reached without attributes, which is not the case here.
+
+Removing it means:
+- app.MapControllers() is the only endpoint mapping call.
+- Every reachable URL in the app is visible directly on the controller/action it belongs to.
+- No accidental matches via the catch-all pattern can occur.
+
+4) URL generation in views (tag helpers) stays consistent with routes
+--------------------------------------------------------------------
+Even though routes are declared in controllers, views generate links using tag helpers:
+
+Example:
+- Asp_projekt/Views/Ocjena/Details.cshtml
+  <a asp-action="Index">Povratak na Index</a>
+
+Example:
+- Asp_projekt/Views/Ocjena/Details.cshtml
+  <a asp-controller="Profesor" asp-action="Details" asp-route-id="@Model.Profesor.Id">...</a>
+
+Principle:
+- You typically *don’t hardcode URLs* like "/Profesor/5".
+- Tag helpers ask routing to generate the correct URL from controller/action/route values.
+- If you change route templates later, these links keep working (as long as controller/action names are stable).
+
+
+5) Common routing shapes in this repo (summary)
+-----------------------------------------------
+Most controllers follow a REST-ish pattern:
+
+- GET /{Controller}              => Index list page
+  Example: [HttpGet("")] on controller [Route("[controller]")]
+
+- GET /{Controller}/{id:int}     => Details page
+  Example: [HttpGet("{id:int}")]
+
+- GET /Ocjena/Create             => Create form
+- POST /Ocjena/Create            => Form submit
+
+- POST /Ocjena/Delete/{id:int}   => Delete action
+  Example: Asp_projekt/Controllers/OcjenaController.cs
+  [HttpPost("Delete/{id:int}")]
+
+
+6) Why pure attribute routing is a good fit here
+-------------------------------------------------
+What this project gains from using attribute routing exclusively:
+- Routes are explicit and easy to read next to the action that handles them.
+- Parameter constraints like {id:int} are obvious and enforced at the routing layer.
+- Verb constraints ([HttpGet]/[HttpPost]) prevent accidental routing to the wrong action.
+- You can add extra routes for the same action (like Home Index handling both "/" and "/Home").
+- There is no hidden fallback pattern that could silently match a typo'd URL.
+

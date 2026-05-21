@@ -1,0 +1,55 @@
+@model Asp_projekt.Models.FakultetEditViewModel
+@{
+    ViewData["Title"] = "Uredi fakultet";
+}
+
+<section class="detail-hero">
+    <span class="hero-badge">Fakultet</span>
+    <div class="hero-main">
+        <h1 class="hero-title">Uredi fakultet</h1>
+        <p class="hero-subtitle">Azuriraj naziv postojeceg fakulteta.</p>
+    </div>
+</section>
+
+<section class="detail-grid">
+    <article class="detail-card core-card">
+        <header class="card-header">
+            <h2>Podaci</h2>
+            <span class="card-tag">Edit</span>
+        </header>
+
+        <form asp-action="Edit" asp-route-id="@Model.Id" method="post">
+            @Html.AntiForgeryToken()
+            <input asp-for="Id" type="hidden" />
+            <div asp-validation-summary="ModelOnly"></div>
+
+            <div class="info-grid">
+                <div class="info-item">
+                    <label class="info-label" asp-for="Naziv">Naziv fakulteta</label>
+                    <input asp-for="Naziv" />
+                    <span asp-validation-for="Naziv"></span>
+                </div>
+            </div>
+
+            <div class="inline-links inline-links--spaced">
+                <button class="link-btn" type="submit">Spremi promjene</button>
+                <a class="link-btn link-btn--ghost" asp-action="Details" asp-route-id="@Model.Id">Odustani</a>
+            </div>
+        </form>
+    </article>
+
+    <article class="detail-card">
+        <header class="card-header">
+            <h2>Napomena</h2>
+            <span class="card-tag">Info</span>
+        </header>
+        <div class="card-copy">
+            <p>Promjena naziva ostavlja povezane profesore, studente i kolegije netaknutima.</p>
+            <p>Nakon spremanja, novi naziv je odmah vidljiv na svim povezanim prikazima.</p>
+        </div>
+    </article>
+</section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

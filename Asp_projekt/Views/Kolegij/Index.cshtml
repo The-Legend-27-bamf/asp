@@ -8,26 +8,22 @@
     <p class="page-subtitle">Kartični pregled kolegija, profesora i studenata.</p>
 </section>
 
-@if (@Model == null || !@Model.Any())
-{
-    <p class="empty-note">Nema dostupnih kolegija.</p>
-}
-else
-{
-    <section class="cards-grid">
-        @foreach (var kolegij in @Model)
-        {
-            <article class="entity-card">
-                <div class="card-top">
-                    <h2 class="card-title">@kolegij.Naziv</h2>
-                </div>
-                <div class="chip-wrap">
-                    <span class="chip chip--accent">ECTS @kolegij.ECTS</span>
-                    <span class="chip chip--ok">Prof: @kolegij.Profesori.Count</span>
-                    <span class="chip chip--ok">Stud: @kolegij.Studenti.Count</span>
-                </div>
-                <a class="link-btn" asp-action="Details" asp-route-id="@kolegij.Id">Details</a>
-            </article>
-        }
-    </section>
-}
+<section class="page-actions">
+    <a class="link-btn" asp-action="Create">Dodaj kolegij</a>
+</section>
+
+<section class="list-toolbar"
+         data-ajax-list-root
+         data-search-url="@Url.Action("Search", "Kolegij")"
+         data-target-id="kolegijListTarget">
+    <label class="info-label" for="kolegijSearch">Brza pretraga</label>
+    <input id="kolegijSearch"
+           type="search"
+           class="search-input"
+           placeholder="Pretrazi po nazivu, profesoru ili studentu..."
+           data-ajax-search-input />
+</section>
+
+<div id="kolegijListTarget">
+    <partial name="_KolegijCards" model="Model" />
+</div>

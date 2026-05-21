@@ -8,10 +8,16 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700&family=Sora:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/Asp_projekt.styles.css" asp-append-version="true" />
 </head>
 <body>
+    @{
+        var currentController = (ViewContext.RouteData.Values["controller"]?.ToString() ?? string.Empty);
+        Func<string, string> navClass = controller =>
+            string.Equals(currentController, controller, StringComparison.OrdinalIgnoreCase) ? "is-active" : string.Empty;
+    }
     <header class="app-header">
         <nav class="app-nav app-shell">
             <a class="app-brand" asp-area="" asp-controller="Home" asp-action="Index">
@@ -26,12 +32,12 @@
                 <span class="brand-name">Akademska Evidencija</span>
             </a>
             <div class="app-links">
-                <a asp-area="" asp-controller="Student" asp-action="Index">Studenti</a>
-                <a asp-area="" asp-controller="Profesor" asp-action="Index">Profesori</a>
-                <a asp-area="" asp-controller="Kolegij" asp-action="Index">Kolegiji</a>
-                <a asp-area="" asp-controller="Fakultet" asp-action="Index">Fakulteti</a>
-                <a asp-area="" asp-controller="Ocjena" asp-action="Index">Ocjene</a>
-                <a asp-area="" asp-controller="Izvjestaj" asp-action="Index">Izvjestaji</a>
+                <a class="@navClass("Student")" asp-area="" asp-controller="Student" asp-action="Index">Studenti</a>
+                <a class="@navClass("Profesor")" asp-area="" asp-controller="Profesor" asp-action="Index">Profesori</a>
+                <a class="@navClass("Kolegij")" asp-area="" asp-controller="Kolegij" asp-action="Index">Kolegiji</a>
+                <a class="@navClass("Fakultet")" asp-area="" asp-controller="Fakultet" asp-action="Index">Fakulteti</a>
+                <a class="@navClass("Ocjena")" asp-area="" asp-controller="Ocjena" asp-action="Index">Ocjene</a>
+                <a class="@navClass("Izvjestaj")" asp-area="" asp-controller="Izvjestaj" asp-action="Index">Izvjestaji</a>
             </div>
         </nav>
     </header>
@@ -49,6 +55,8 @@
     </footer>
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/hr.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
